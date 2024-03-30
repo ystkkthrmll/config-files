@@ -25,6 +25,8 @@ variables:
   urlcolor: brown
   toccolor: blue
 
+  # `sourcesanspro` is used in the following:
+  # * https://github.com/Wandmalfarbe/pandoc-latex-template
   fontfamily: sourcesanspro
   fontfamilyoptions:
   - default
