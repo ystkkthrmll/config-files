@@ -1,0 +1,46 @@
+
+# standalone: true
+
+table-of-contents: true
+
+# toc-depth: 3
+
+pdf-engine: lualatex
+
+number-sections: true
+
+variables:
+  documentclass: ltjsreport
+  # documentclass: ltjsbook
+  # documentclass: ltjsarticle
+  # documentclass: mydocument
+  classoption:
+  - english
+  # - math
+  # - programming
+  # colorlinks: true
+  # linkcolor: teal
+  # filecolor: cyan
+  # citecolor: magenta
+  # urlcolor: brown
+  # toccolor: blue
+
+  fontfamily: sourcesanspro
+  fontfamilyoptions:
+  - default
+
+# highlight-style: pygments
+# highlight-style: kate
+highlight-style: espresso
+# highlight-style: tango
+
+# reference-links: true
+
+pdf-engine-opts:
+- '-shell-escape'
+
+top-level-division: chapter
+
+
+
+
