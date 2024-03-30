@@ -1,9 +1,9 @@
 
-# standalone: true
+standalone: true
 
 table-of-contents: true
 
-# toc-depth: 3
+toc-depth: 3
 
 pdf-engine: lualatex
 
@@ -18,12 +18,12 @@ variables:
   - english
   # - math
   # - programming
-  # colorlinks: true
-  # linkcolor: teal
-  # filecolor: cyan
-  # citecolor: magenta
-  # urlcolor: brown
-  # toccolor: blue
+  colorlinks: true
+  linkcolor: teal
+  filecolor: cyan
+  citecolor: magenta
+  urlcolor: brown
+  toccolor: blue
 
   fontfamily: sourcesanspro
   fontfamilyoptions:
@@ -34,7 +34,7 @@ variables:
 highlight-style: espresso
 # highlight-style: tango
 
-# reference-links: true
+reference-links: true
 
 pdf-engine-opts:
 - '-shell-escape'
