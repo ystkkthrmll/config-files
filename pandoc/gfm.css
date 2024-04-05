@@ -5,7 +5,8 @@
 
 .note {
   .title{
-    color:blue;
+    color: blue;
+    font-weight: bold;
   }
   color:red;
           background-color: #f0f7fb;
@@ -18,7 +19,8 @@
 
 .tip {
   .title{
-    color:blue;
+    color: blue;
+    font-weight: bold;
   }
   color:red;
           background-color: #f0f7fb;
@@ -28,5 +30,15 @@
      overflow: hidden;
      padding: 12px;
 }
+
+
+.note:before{
+  font-weight: bold;
+  content: "Note: ";
+}
+
+
+
+
 
 
