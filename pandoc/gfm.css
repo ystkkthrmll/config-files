@@ -37,6 +37,10 @@
   content: "Note: ";
 }
 
+code {
+  color: black;
+  background-color: lightgray;
+}
 
 
 
