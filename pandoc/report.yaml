@@ -59,9 +59,13 @@ variables:
     <style>
     blockquote {
       background-color: lightgray;
-      border-left: solid 4px black;
+      border-left: solid 8px black;
       padding: 5px;
+      margin-left: 6%;
+    }
+    body {
       margin-left: 3%;
+      margin-right: 3%;
     }
     code {
       color: black;
@@ -69,12 +73,12 @@ variables:
       # background-color: whitesmoke;
       background-color: gainsboro;
       padding: 3px;
-      font-family: monospace;
+      font-family: monospace, sans-serif;
     }
     div.sourceCode {
       background-color: gainsboro;
-      border: solid 2px black;
-      padding: 10px;
+      border: solid 1px black;
+      padding: 8px;
     }
     .note {
       color: black;
@@ -85,10 +89,14 @@ variables:
       overflow: hidden;
       padding: 12px;
     }
-    .note:before{
+    .note:before {
       font-weight: bold;
       content: "Note: ";
       padding: 5px;
+    }
+    p {
+      margin-left: 3%;
+      margin-right: 3%;
     }
     tr.even {
       background-color: #f0f0f0;
