@@ -43,5 +43,33 @@ references:
   title-short: Python
   URL: https://docs.python.org/3/
 
+- title: The Art of Readable Code
+  id: the-art-of-readable-code
+  type: book
+  author:
+  - Dustin Boswell
+  - Trevor Foucher
+  publisher: O'Reilly
+  issued:
+    date-parts:
+    - - 2012
+  # updated: 2022-12-23T21:34:36
+
+- id: numpy
+  type: article-journal
+  title: NumPy documentation — NumPy v1.26 Manual
+  title-short: numpy
+  URL: https://numpy.org/doc/stable/
+  # updated: 2024-04-07T21:39:34
+
+- id: pandas
+  type: article-journal
+  title: pandas documentation — pandas 2.2.1 documentation
+  title-short: pandas
+  URL: https://pandas.pydata.org/docs/
+  # updated: 2024-04-07T21:36:46
+
+
+
 
 
