@@ -37,6 +37,11 @@ references:
   id: postgresql
   URL: https://www.postgresql.org/docs/current/
 
+- id: python
+  type: article-journal
+  title: Python documentation
+  title-short: Python
+  URL: https://docs.python.org/3/
 
 
 
