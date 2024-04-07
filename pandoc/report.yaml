@@ -58,14 +58,15 @@ variables:
   - | # Ref: https://pandoc.org/MANUAL.html#variables-for-html
     <style>
     blockquote {
-      background-color: lightgray;
+      background-color: whitesmoke;
       border-left: solid 8px black;
       padding: 5px;
-      margin-left: 6%;
+      margin-left: 5%;
+      margin-right: 3%;
     }
     body {
-      margin-left: 3%;
-      margin-right: 3%;
+      margin-left: 5%;
+      margin-right: 5%;
     }
     code {
       color: black;
@@ -79,6 +80,8 @@ variables:
       background-color: gainsboro;
       border: solid 1px black;
       padding: 8px;
+      margin-left: 3%;
+      margin-right: 3%;
     }
     .note {
       color: black;
@@ -95,8 +98,16 @@ variables:
       padding: 5px;
     }
     p {
-      margin-left: 3%;
-      margin-right: 3%;
+      margin-left: 2%;
+      margin-right: 2%;
+    }
+    table {
+      border: 1px black solid;
+    }
+    thead tr {
+      background-color: black;
+      color: white;
+      # text-align: left;
     }
     tr.even {
       background-color: #f0f0f0;
