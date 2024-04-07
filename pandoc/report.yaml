@@ -1,13 +1,5 @@
 
-standalone: true
-
-table-of-contents: true
-
-toc-depth: 3
-
-pdf-engine: lualatex
-
-number-sections: true
+citeproc: true
 
 highlight-style: pygments
 # highlight-style: kate
@@ -16,10 +8,23 @@ highlight-style: pygments
 # highlight-style: zenburn
 # highlight-style: breezedark
 
-reference-links: true
+number-sections: true
+
+standalone: true
+
+pdf-engine: lualatex
 
 pdf-engine-opts:
 - '-shell-escape'
+
+reference-links: true
+
+resource-path:
+- ${HOME}/Dropbox/config-files/pandoc/refs
+
+table-of-contents: true
+
+toc-depth: 3
 
 top-level-division: chapter
 
@@ -50,7 +55,7 @@ variables:
   fontsize: 12pt
   header-includes:
   - <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  - |
+  - | # Ref: https://pandoc.org/MANUAL.html#variables-for-html
     <style>
     blockquote {
       font-style: italic;
@@ -70,6 +75,7 @@ variables:
       # background-color: whitesmoke;
       background-color: gainsboro;
       padding: 3px;
+      font-family: monospace;
     }
     div.sourceCode {
       background-color: gainsboro;

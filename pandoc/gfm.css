@@ -1,5 +1,4 @@
 
-
 /* Ref: https://www.madcapsoftware.com/blog/css-tip-creating-styled-boxes-notes-warnings-examples-tips/ */
 /* Ref: https://web-camp.io/magazine/archives/87658 */
 
@@ -8,7 +7,7 @@
     color: blue;
     font-weight: bold;
   }
-  color:red;
+  color:black;
           background-color: #f0f7fb;
      border-left: solid 4px #3498db;
      line-height: 18px;
@@ -17,12 +16,18 @@
      padding: 12px;
 }
 
+.note:before{
+  font-weight: bold;
+  content: "Note: ";
+  padding: 5px;
+}
+
 .tip {
   .title{
     color: blue;
     font-weight: bold;
   }
-  color:red;
+  color:black;
           background-color: #f0f7fb;
      border-left: solid 4px #3498db;
      line-height: 18px;
@@ -31,15 +36,10 @@
      padding: 12px;
 }
 
-
-.note:before{
-  font-weight: bold;
-  content: "Note: ";
-}
-
 code {
   color: black;
   background-color: lightgray;
+  font-family: monospace;
 }
 
 
