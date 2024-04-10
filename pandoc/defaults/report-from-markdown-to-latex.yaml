@@ -1,0 +1,35 @@
+
+defaults: common.yaml
+
+pdf-engine: lualatex
+
+pdf-engine-opts:
+- '-shell-escape'
+
+variables:
+  # documentclass: ltjsreport
+  # documentclass: ltjsbook
+  # documentclass: ltjsarticle
+  documentclass: mydocument
+  classoption:
+  - english
+  # - math
+  # - programming
+  colorlinks: true
+  linkcolor: teal
+  filecolor: cyan
+  citecolor: magenta
+  urlcolor: brown
+  toccolor: blue
+
+  # `sourcesanspro` is used in the following:
+  # * https://github.com/Wandmalfarbe/pandoc-latex-template
+  fontfamily: sourcesanspro
+  fontfamilyoptions:
+  - default
+  # - semibold
+  # - light
+  # - regular
+  fontsize: 10pt
+
+
