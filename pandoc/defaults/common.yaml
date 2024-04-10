@@ -2,10 +2,10 @@
 
 citeproc: true
 
-highlight-style: pygments
+# highlight-style: pygments
 # highlight-style: kate
 # highlight-style: espresso
-# highlight-style: tango
+highlight-style: tango
 # highlight-style: zenburn
 # highlight-style: breezedark
 

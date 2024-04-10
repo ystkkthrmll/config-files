@@ -14,7 +14,7 @@ variables:
   classoption:
   - english
   # - math
-  # - programming
+  - programming
   colorlinks: true
   linkcolor: teal
   filecolor: cyan
@@ -31,5 +31,13 @@ variables:
   # - light
   # - regular
   fontsize: 10pt
+  header-includes:
+  - | # https://gist.github.com/wusunlab/9c85fcb7472308a474e7c3fb443639ee
+    \usepackage{xcolor}
+    \usepackage{soul}
+    \definecolor{inlineBG}{HTML}{F3F3F3}
+    \sethlcolor{inlineBG}
+    \let\OldTexttt\texttt
+    \renewcommand{\texttt}[1]{\sethlcolor{inlineBG}{\ttfamily\hl{\mbox{#1}}}}
 
 
