@@ -52,7 +52,9 @@ variables:
         colframe=black!75!black,
         sharp corners,
         boxrule=0mm,
-        leftrule=3mm,
+        leftrule=1mm,
+        left=-20pt,
+        left skip=15pt,
       ]
     }
     \AtEndEnvironment{quote}{\end{tcolorbox}}

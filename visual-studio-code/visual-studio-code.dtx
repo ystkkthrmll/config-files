@@ -1,0 +1,422 @@
+%
+% ^^A Configuring DocStrip [[[
+% \iffalse
+%<*driver>
+\input mydocstrip
+\mygenerate[output-files/visual-studio-code]{
+  keybindings.json,
+  settings.json,
+}
+\myendbatchfile
+\mydriver[
+  show-notes,
+]
+%</driver>
+% \fi
+% ^^A ]]] End of Configuring DocStrip
+%
+% \mytitle{Visual Studio Code}
+%
+% \begin{abstract}^^A [[[
+% Visual Studio Code
+% \end{abstract}^^A ]]]
+%
+% \begin{mynote}^^A [[[
+% \begin{myitemize}
+% \1 Command id
+%   \2 \href{https://code.visualstudio.com/docs/getstarted/keybindings#_default-keyboard-shortcuts}{Key Bindings for Visual Studio Code}
+%   \2 \href{https://code.visualstudio.com/api/references/commands}{Built-in Commands}
+% \1 Context keys
+%   \2 \href{https://code.visualstudio.com/api/references/when-clause-contexts#available-context-keys}{Available context keys}
+% \1 Jupyter Notebook
+%   \2 \href{https://code.visualstudio.com/docs/datascience/jupyter-notebooks}{Jupyter Notebooks in VS Code}
+% \1 
+% \end{myitemize}
+% \end{mynote}^^A ]]]
+%
+% \mytableofcontents
+%
+% \part{\texttt{keybindings.json}}^^A [[[
+%
+% \section{Implemantation}^^A [[[
+% \iffalse
+%<*keybindings.json>
+% \fi
+% \begin{jsoncode}
+[
+% \end{jsoncode}
+%
+% \subsection{capslock -> escape}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://stackoverflow.com/questions/48369303/use-in-visual-studio-code-vim-extension-caps-instead-of-esc}{Use in Visual Studio Code (Vim extension) CAPS instead of ESC}
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  {
+    "key": "capslock",
+    "command": "extension.vim_escape",
+    "when": "editorTextFocus && vim.active && !inDebugRepl"
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `capslock -> escape'.
+%
+% \subsection{IntelliSense}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://qiita.com/carnelia0702/items/fc736cfc61daa282f789}{Ctrl+SpaceでVSCodeのIntelliSenseの候補を選択する}
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  {
+    "key": "tab",
+    "command": "selectNextSuggestion",
+    "when": "editorTextFocus && suggestWidgetMultipleSuggestions && suggestWidgetVisible"
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `IntelliSense'.
+%
+% \subsection{outline.focus}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://stackoverflow.com/questions/57222659/create-a-shortcut-to-toggle-the-outline-view-in-vscode}{Create a shortcut to toggle the Outline view in VSCode}
+% \1 The origin of `O'
+%   \2 Outline
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  {
+    "key": "ctrl+o",
+    "command": "outline.focus",
+    "when": "vim.mode == 'Normal'"
+    // "when": "editorTextFocus"
+  },
+  // {
+    // "key": "shift+o",
+    // "command": "workbench.action.focusRightGroup",
+    // "when": "outline.active"
+  // },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `outline.focus'.
+%
+% \subsection{Save}[updated=]^^A [[[
+% \begin{jsoncode}
+  {
+    "key": "enter",
+    "command": "workbench.action.files.save",
+    "when": "inputFocus && vim.mode == 'Normal'"
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `IntelliSense'.
+%
+% \subsection{Switch window}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://stackoverflow.com/questions/36328029/is-there-a-hotkey-to-switch-between-split-window-panes}{Is there a hotkey to switch between split window panes?}
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  {
+    // "key": "^",
+    "key": "m",
+    "command": "workbench.action.navigateEditorGroups",
+    "when": "editorTextFocus && vim.mode == 'Normal'"
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `Switch window'.
+%
+% \subsection{workbench.action.closeActiveEditor}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://code.visualstudio.com/docs/getstarted/keybindings#_editorwindow-management}{Editor/Window Management}
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  {
+    "key": "q",
+    "command": "workbench.action.closeActiveEditor",
+    // "when": "inputFocus && vim.mode == 'Normal'"
+    "when": "editorTextFocus && vim.mode == 'Normal'"
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `workbench.action.closeActiveEditor'.
+%
+% \subsection{workbench.action.focusActiveEditorGroup}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 The origin of `E'
+%   \2 Editor
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  {
+    "key": "ctrl+e",
+    "command": "workbench.action.focusActiveEditorGroup",
+    "when": "!editorFocus"
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `workbench.action.focusActiveEditorGroup'.
+%
+% \subsection{workbench.action.terminal.focus}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://superuser.com/questions/1270103/how-to-switch-the-cursor-between-terminal-and-code-in-vscode}{How to switch the cursor between terminal and code in VSCode?}
+% \1 \href{https://stackoverflow.com/questions/42796887/switch-focus-between-editor-and-integrated-terminal}{Switch focus between editor and integrated terminal}
+% \1 The origin of `T'
+%   \2 Terminal
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  {
+    "key": "ctrl+t",
+    "command": "workbench.action.terminal.focus",
+    "when": "inputFocus && vim.mode == 'Normal'"
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `workbench.action.terminal.focus'.
+%
+% \subsection{workbench.view.explorer}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://code.visualstudio.com/docs/getstarted/keybindings#_display}{Display}
+% \1 The origin of `F'
+%   \2 File explorer
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  {
+    "key": "ctrl+f",
+    "command": "workbench.view.explorer",
+    "when": "vim.mode == 'Normal'"
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `workbench.view.explorer'.
+%
+% \subsection{Toggling line comment}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 下記エディターではデフォルトで\verb|Ctrl+/|でコメントを切り替えている
+%   \2 Eclipse
+%   \2 Jupyter notebook
+%   \2 Visual Studio Code
+% \end{myitemize}
+%
+% \begin{jsoncode}
+%   {
+%     "key": "ctrl+[Slash]",
+%     "command": "editor.action.commentLine",
+%     "when": "inputFocus && vim.mode == 'Normal'"
+%   },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `Toggling line comment'.
+%
+% \subsection{markdown.showPreviewToSide}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://stackoverflow.com/questions/34125174/can-vscode-display-a-markdown-syntax-preview-pane}{Can VSCode display a Markdown syntax preview pane?}
+% \1 The origin of `P'
+%   \2 Preview
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  {
+    "key": "ctrl+p",
+    "command": "markdown.showPreviewToSide",
+    "when": "inputFocus"
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `markdown.showPreviewToSide'.
+%
+% \subsection{markdown: surround with left single quote}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://stackoverflow.com/questions/42363030/visual-studio-code-surround-with}{Visual Studio Code Surround With}
+% \1 \href{https://code.visualstudio.com/docs/getstarted/keybindings#_running-multiple-commands}{Running multiple commands}
+% \1 \href{https://code.visualstudio.com/docs/editor/userdefinedsnippets#_variables}{Variables}
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  {
+    // "key": "[Backquote]",
+    "key": "`",
+    // "key": "ctrl+c",
+    "command": "runCommands",
+    "when": "editorLangId == markdown && editorTextFocus && vim.mode == 'Normal'",
+    "args": {
+      "commands": [
+        {
+          "command": "editor.action.addSelectionToNextFindMatch",
+        },
+        {
+          "command": "editor.action.insertSnippet",
+          "args": {
+            "snippet": "`${TM_SELECTED_TEXT}`"
+          //   "snippet": "`${TM_CURRENT_WORD}`"
+          }
+        }
+      ]
+    }
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `markdown'.
+%
+% \begin{jsoncode}
+]
+% \end{jsoncode}
+% \iffalse
+%</keybindings.json>
+% \fi
+% ^^A ]]] End of section `Implemantation'.
+%
+% ^^A ]]] End of part `keybindings.json'.
+%
+% \part{\texttt{settings.json}}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://code.visualstudio.com/docs/getstarted/settings#_settingsjson}{settings.json}
+%   \2 \myemph{View} > \myemph{Command Palette} > \myemph{Preferences: Open User Settings (JSON)}
+% \end{myitemize}
+%
+% \section{Implemantation}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://code.visualstudio.com/docs/getstarted/settings#_default-settings}{Default settings}
+% \end{myitemize}
+%
+% \iffalse
+%<*settings.json>
+% \fi
+% \begin{jsoncode}
+{
+% \end{jsoncode}
+%
+% \subsection{editor}[updated=]^^A [[[
+%
+% \subsubsection{fontSize}[updated=]^^A [[[
+% \begin{jsoncode}
+  "editor.fontSize": 16,
+% \end{jsoncode}
+% ^^A ]]] End of subsubsection `fontSize'.
+%
+% \subsubsection{tabSize}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://stackoverflow.com/questions/29972396/how-can-i-customize-the-tab-to-space-conversion-factor-in-vs-code}{How can I customize the tab-to-space conversion factor in VS Code?}
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+% \end{jsoncode}
+% ^^A ]]] End of subsubsection `tabSize'.
+%
+% \subsubsection{folding}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://qiita.com/Yarakashi_Kikohshi/items/1a275f2046b002e398b3}{LaTeX Workshop をもう少し使いこなす}
+% \1 
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  "editor.folding": true,
+  "editor.showFoldingControls": "always",
+% \end{jsoncode}
+% ^^A ]]] End of subsubsection `folding'.
+%
+% ^^A ]]] End of subsection `editor'.
+%
+% \subsection{json}[updated=]^^A [[[
+% \begin{jsoncode}
+  "[json]": {
+% \end{jsoncode}
+%
+% \subsubsection{tabSize}[updated=]^^A [[[
+% \begin{jsoncode}
+    "editor.tabSize": 2,
+% \end{jsoncode}
+% ^^A ]]] End of subsubsection `tabSize'.
+%
+% \begin{jsoncode}
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `json'.
+%
+% \subsection{markdown}[updated=]^^A [[[
+% \begin{jsoncode}
+  "[markdown]": {
+% \end{jsoncode}
+%
+% \subsubsection{tabSize}[updated=]^^A [[[
+% \begin{jsoncode}
+    "editor.tabSize": 2,
+% \end{jsoncode}
+% ^^A ]]] End of subsubsection `tabSize'.
+%
+% \subsubsection{\texttt{quickSuggestions}}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 Reference:
+%   \2 \href{https://www.deepanseeralan.com/tech/enable-quick-suggestions-for-markdown-in-vscode/}{Enable quick suggestions for Markdown in VS Code}
+% \end{myitemize}
+%
+% \begin{jsoncode}
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": true,
+      "strings": true
+    },
+% \end{jsoncode}
+% ^^A ]]] End of subsubsection `quickSuggestions'.
+%
+% \begin{jsoncode}
+  },
+% \end{jsoncode}
+% ^^A ]]] End of subsection `markdown'.
+%
+% \subsection{python}[updated=]^^A [[[
+%
+% \subsubsection{\texttt{python.analysis.autoImportCompletions}}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 Reference:
+%   \2 \href{https://github.com/microsoft/pylance-release?tab=readme-ov-file#settings-and-customization}{python.analysis.autoImportCompletions}
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  "python.analysis.autoImportCompletions": true,
+% \end{jsoncode}
+% ^^A ]]] End of subsubsection `python.analysis.autoImportCompletions'.
+%
+% ^^A ]]] End of subsection `python'.
+%
+% \subsection{vim}[updated=]^^A [[[
+%
+% \subsubsection{\texttt{vim.foldfix}}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 折りたたみ上をカーソル移動しても開かないようにするための設定
+%   \2 \href{https://stackoverflow.com/questions/50888475/code-folds-are-automatically-opened-when-cursor-moves-over-them-in-vs-code-vim}{Code folds are automatically opened when cursor moves over them in VS Code Vim. How can I prevent this?}
+% \end{myitemize}
+%
+% \begin{jsoncode}
+  "vim.foldfix": true,
+% \end{jsoncode}
+% ^^A ]]] End of subsubsection `vim.foldfix'.
+%
+% \subsubsection{\texttt{vim.vimrc}}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://qiita.com/kino-ma/items/735148fe58dc14898903}{VSCodeでvimrcの設定を読み込みたい}
+% \end{myitemize}
+%
+% \begin{jsoncode}
+%   "vim.vimrc.enable": true,
+%   "vim.vimrc.path": "$HOME/Dropbox/configuration-files/vim/output-files/configuration-files/init.vim",
+% \end{jsoncode}
+% ^^A ]]] End of subsubsection `vim.vimrc'.
+%
+% \begin{jsoncode}
+  "vim.normalModeKeyBindings": [
+    {
+      "before": ["<space>"],
+      "after": ["z", "a"]
+    },
+  ],
+% \end{jsoncode}
+% ^^A ]]] End of subsection `vim'.
+%
+% \begin{jsoncode}
+}
+% \end{jsoncode}
+% \iffalse
+%</settings.json>
+% \fi
+% ^^A ]]] End of section `Implemantation'.
+%
+% ^^A ]]] End of part `settings.json'.
+%
+% ^^A \endinput
+%
+% ^^A End of file `visual-studio-code.dtx'.

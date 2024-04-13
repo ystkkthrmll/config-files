@@ -6,11 +6,13 @@ config-files
 ├── README.md
 ├── pandoc
 │   ├── defaults
-│   │   ├── html.yaml
-│   │   ├── report.yaml
-│   ├── refs/bibliograph   .yaml
-│   ├── 
-│   └── 
+│   │   ├── common.yaml
+│   │   ├── report-from-markdown-to-html.yaml
+│   │   ├── report-from-markdown-to-latex.yaml
+│   ├── refs
+│   │   ├── misc.yaml
+└── visual-stadio-code
+    └── visual-stadio-code.dtx
 ```
 
 
