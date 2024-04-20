@@ -14,6 +14,7 @@
   Dockerfile,
   requirements.txt,
 }
+\myrenamefile{Dockerfile.tex}{Dockerfile}
 \myendbatchfile
 \mydriver[
   show-notes,
@@ -478,6 +479,21 @@ RUN python -m pip install -r requirements.txt
 %</Dockerfile>
 % \fi
 % ^^A ]]] End of section `Dockerfile'.
+%
+% \section{\texttt{requirements.txt}}^^A [[[
+% \iffalse
+%<*requirements.txt>
+% \fi
+% \begin{yamlcode}
+pandas
+plotly
+pyyaml
+
+% \end{yamlcode}
+% \iffalse
+%</requirements.txt>
+% \fi
+% ^^A ]]] End of section `requirements.txt'.
 %
 % ^^A ]]] End of part `Data analysis'.
 %
