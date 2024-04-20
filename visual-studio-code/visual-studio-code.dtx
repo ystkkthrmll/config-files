@@ -3,9 +3,16 @@
 % \iffalse
 %<*driver>
 \input mydocstrip
-\mygenerate[output-files/visual-studio-code]{
+\mygenerate{
   keybindings.json,
   settings.json,
+}
+% ^^A Data analysis
+\mygenerate{
+  compose.yaml,
+  devcontainer.json,
+  Dockerfile,
+  requirements.txt,
 }
 \myendbatchfile
 \mydriver[
@@ -418,5 +425,60 @@
 % ^^A ]]] End of part `settings.json'.
 %
 % ^^A \endinput
+%
+% \part{Data analysis}^^A [[[
+%
+% \section{\texttt{compose.yaml}}^^A [[[
+% \iffalse
+%<*compose.yaml>
+% \fi
+% \begin{yamlcode}
+services:
+  data-analysis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+    - ../..:/workspaces:cached
+
+% \end{yamlcode}
+% \iffalse
+%</compose.yaml>
+% \fi
+% ^^A ]]] End of section `compose.yaml'.
+%
+% \section{\texttt{devcontainer.json}}^^A [[[
+% \iffalse
+%<*devcontainer.json>
+% \fi
+% \begin{jsoncode}
+{
+  "name": "data analysis",
+  "dockerComposeFile": "compose.yaml",
+  "service": "data-analysis",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
+}
+% \end{jsoncode}
+% \iffalse
+%</devcontainer.json>
+% \fi
+% ^^A ]]] End of section `devcontainer.json'.
+%
+% \section{\texttt{Dockerfile}}^^A [[[
+% \iffalse
+%<*Dockerfile>
+% \fi
+% \begin{yamlcode}
+FROM mcr.microsoft.com/devcontainers/python
+COPY requirements.txt .
+RUN python -m pip install -r requirements.txt
+
+% \end{yamlcode}
+% \iffalse
+%</Dockerfile>
+% \fi
+% ^^A ]]] End of section `Dockerfile'.
+%
+% ^^A ]]] End of part `Data analysis'.
 %
 % ^^A End of file `visual-studio-code.dtx'.
