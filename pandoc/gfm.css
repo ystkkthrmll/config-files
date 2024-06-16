@@ -16,31 +16,58 @@
      padding: 12px;
 }
 
-.note:before{
-  font-weight: bold;
-  content: "Note: ";
-  padding: 5px;
-}
+/* .note:before{ */
+  /* font-weight: bold; */
+  /* content: "Note: "; */
+  /* padding: 5px; */
+/* } */
 
 .tip {
   .title{
-    color: blue;
+    color: green;
     font-weight: bold;
   }
   color:black;
-          background-color: #f0f7fb;
-     border-left: solid 4px #3498db;
-     line-height: 18px;
-     mc-auto-number-format: '{b}Tip: {/b}';
-     overflow: hidden;
-     padding: 12px;
+  background-color: greenyellow;
+  border-left: solid 4px green;
+  line-height: 18px;
+  mc-auto-number-format: '{b}Tip: {/b}';
+  overflow: hidden;
+  padding: 12px;
 }
 
-code {
+/* .tip:before{ */
+  /* font-weight: bold; */
+  /* content: "Tip: "; */
+  /* padding: 5px; */
+/* } */
+
+.warning {
+  .title{
+    color: red;
+    font-weight: bold;
+  }
   color: black;
-  background-color: lightgray;
-  font-family: monospace;
+  background-color: pink;
+  border-left: solid 4px red;
+  line-height: 18px;
+  mc-auto-number-format: '{b}Tip: {/b}';
+  overflow: hidden;
+  padding: 12px;
 }
+
+/* .warning:before{ */
+  /* font-weight: bold; */
+  /* content: "Warning: "; */
+  /* padding: 5px; */
+/* } */
+
+
+/* code { */
+  /* color: black; */
+  /* background-color: lightgray; */
+  /* font-family: monospace; */
+/* } */
 
 
 
