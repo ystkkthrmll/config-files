@@ -1,32 +1,13 @@
 
-citeproc: true
+css: ${HOME}/Dropbox/config-files/pandoc/gfm.css
 
-# highlight-style: pygments
-# highlight-style: kate
-highlight-style: espresso
-# highlight-style: tango
-# highlight-style: zenburn
-# highlight-style: breezedark
+defaults: common.yaml
 
-number-sections: true
+from: gfm+alerts
 
-standalone: true
+template: ${HOME}/.pandoc/templates/bootstrap_menu.html
 
-# pdf-engine: lualatex
-
-# pdf-engine-opts:
-# - '-shell-escape'
-
-reference-links: true
-
-# resource-path:
-# - ${HOME}/Dropbox/config-files/pandoc/refs
-
-table-of-contents: true
-
-toc-depth: 3
-
-top-level-division: chapter
+to: html
 
 variables:
   # documentclass: ltjsreport
@@ -37,12 +18,12 @@ variables:
   # - english
   # # - math
   # # - programming
-  colorlinks: true
-  linkcolor: teal
-  filecolor: cyan
-  citecolor: magenta
-  urlcolor: brown
-  toccolor: blue
+  # colorlinks: true
+  # linkcolor: teal
+  # filecolor: cyan
+  # citecolor: magenta
+  # urlcolor: brown
+  # toccolor: blue
 
   # # `sourcesanspro` is used in the following:
   # # * https://github.com/Wandmalfarbe/pandoc-latex-template
