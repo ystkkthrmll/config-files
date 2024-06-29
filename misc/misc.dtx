@@ -176,11 +176,17 @@ Host github.com
 %<*config.home>
 % \fi
 %
-% \subsection{bitbucket}[updated=]^^A [[[
+% \subsection{github.com}[updated=]^^A [[[
 % \begin{bashcode}
+Host github.com
+    HostName github.com
+    User git
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/github-ystkkthrmll
+    Compression yes
 
 % \end{bashcode}
-% ^^A ]]] End of subsection `bitbucket'.
+% ^^A ]]] End of subsection `github.com'.
 %
 % \iffalse
 %</config.home>
