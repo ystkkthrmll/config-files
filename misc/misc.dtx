@@ -750,6 +750,7 @@ file:///mnt/hgfs/job job
 %   \2 \verb|.zip|: 圧縮ファイル
 %   \2 \verb|.ipynb_checkpoints|: jupyter notebookで生成されるファイル
 %   \2 \verb|output-files|: mydocstrip.texで出力されるファイルの出力先
+%   \2 \verb|__init__.py|: Pythonで自動生成されるファイル
 % \end{myitemize}
 %
 % \iffalse
@@ -758,7 +759,7 @@ file:///mnt/hgfs/job job
 % \begin{bashcode}
 *.bib
 *.csv
-*.html
+# *.html
 *.jpg
 *.log
 *.pdf
@@ -768,6 +769,7 @@ file:///mnt/hgfs/job job
 *.zip
 .ipynb_checkpoints
 output-files
+__init__.py
 % \end{bashcode}
 % \iffalse
 %</.gitignore>
