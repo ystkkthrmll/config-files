@@ -1,0 +1,217 @@
+# bibファイル生成コマンド：
+# $ references
+
+science & math:
+
+- title: 線型代数入門
+  key: 線型代数入門
+  author:
+  - 齋藤 正彦
+  publisher: 東京大学出版会
+  year: 2002
+  series: 基礎数学1
+  note: 東京大学理学部数学科卒業
+  type: book
+  updated: 2022-05-05T20:05:04
+
+- title: 解析入門I
+  key: 解析入門I
+  author:
+  - 杉浦 光夫
+  publisher: 東京大学出版会
+  year: 2003
+  series: 基礎数学2
+  note: 東京大学理学部数学科卒業
+  type: book
+  updated: 2022-05-08T18:26:09
+
+- title: 物理数学入門
+  key: 物理数学入門
+  author:
+  - 谷島 賢二
+  publisher: 東京大学出版会
+  year: 2001
+  series: 基礎数学11
+  note: 東京大学理学部数学科卒業
+  type: book
+  updated: 2024-02-24T15:55:43
+
+- title: 数学の基礎 集合・数・位相
+  key: 数学の基礎
+  author:
+  - 齋藤 正彦
+  publisher: 東京大学出版会
+  year: 2014
+  series: 基礎数学14
+  note: 東京大学理学部数学科卒業
+  type: book
+  updated: 2022-05-08T21:12:33
+
+- title: 数理解析学概論
+  key: 数理解析学概論
+  author:
+  - 北田 均
+  publisher: 現代数学社
+  year: 2018
+  type: book
+  updated: 2022-05-08T18:31:13
+
+- title: キューネン数学基礎論講義
+  key: キューネン数学基礎論講義
+  author:
+  - ケネス・キューネン
+  publisher: 日本評論社
+  year: 2016
+  type: book
+  updated: 2022-06-30T00:56:56
+
+- title: 集合論 独立性証明への案内
+  key: 集合論
+  author:
+  - ケネス・キューネン
+  publisher: 日本評論社
+  year: 2019
+  type: book
+  updated: 2022-07-03T11:13:31
+
+- title: 現代集合論入門（増補版）
+  key: 現代集合論入門
+  author:
+  - 竹内外史
+  publisher: 日本評論社
+  year: 2016
+  type: book
+  updated: 2022-07-06T22:29:14
+
+- title: 統計学入門
+  key: 統計学入門
+  author:
+  - 松原 望
+  - 縄田 和満
+  - 中井 検裕
+  publisher: 東京大学出版会
+  year: 2020
+  series: 基礎統計学I
+  type: book
+  updated: 2022-05-05T21:49:02
+
+computers & technology:
+
+- title: \LaTeXe 美文書作成入門
+  key: LaTeX2e美文書作成入門
+  author:
+  - 奥村 晴彦
+  - 黒木 裕介
+  publisher: 技術評論社
+  year: 2017
+  edition: 7
+  note: 奥村 晴彦：名古屋大学理学部卒
+  type: book
+  updated: 2022-05-05T19:58:35
+
+- title: 独習\LaTeXe
+  key: 独習LaTeX2e
+  author:
+  - 吉永 徹美
+  publisher: 翔泳社
+  year: 2008
+  note:
+  - 京都大学理学部卒
+  type: book
+  updated: 2022-05-05T19:46:54
+
+- title: 独習Java
+  key: 独習Java
+  author:
+  - ジョセフ・オニール
+  publisher: 翔泳社
+  year: 2010
+  edition: 4
+  note:
+  - スタンフォード大学
+  type: book
+  updated: 2023-08-14T11:52:47
+
+- title: ゼロから作るDeep Learning --- Pythonで学ぶディープラーニングの理論と実装
+  key: deep-learning-from-scratch
+  author:
+  - 斎藤 康毅
+  publisher: O'Reilly
+  year: 2016
+  type: book
+  note: |-
+    東京工業大学工学部卒業
+    The origin of `deep-learning-from-scratch': https://github.com/oreilly-japan/deep-learning-from-scratch
+  updated: 2023-10-07T17:59:19
+
+- title: ゼロから作るDeep Learning 2 --- 自然言語処理編
+  key: deep-learning-from-scratch-2
+  author:
+  - 斎藤 康毅
+  publisher: O'Reilly
+  year: 2023
+  type: book
+  note: |-
+    東京工業大学工学部卒業
+    The origin of `deep-learning-from-scratch': https://github.com/oreilly-japan/deep-learning-from-scratch
+  updated: 2024-01-01T19:41:23
+
+- title: ゼロから作るDeep Learning 4 --- 強化学習編
+  key: deep-learning-from-scratch-4
+  author:
+  - 斎藤 康毅
+  publisher: O'Reilly
+  year: 2022
+  type: book
+  note: |-
+    東京工業大学工学部卒業
+    The origin of `deep-learning-from-scratch': https://github.com/oreilly-japan/deep-learning-from-scratch
+  updated: 2024-01-13T19:09:11
+
+- title: Hands-On Machine Learning with Scikit-Learn \& TensorFlow
+  key: hands-on-machine-learning-with-scikit-learn-and-tensorflow
+  author:
+  - Aurélien Géron
+  publisher: O'Reilly
+  year: 2017
+  type: book
+  updated: 2022-05-05T21:32:50
+
+- title: Python for Data Analysis
+  key: python-for-data-analysis
+  author:
+  - Wes McKinney
+  publisher: O'Reilly
+  year: 2018
+  edition: 2
+  type: book
+  updated: 2022-05-05T21:40:17
+
+- title: Python Data Science Handbook
+  key: python-data-science-handbook
+  author:
+  - Jake VanderPlas
+  publisher: O'Reilly
+  year: 2017
+  type: book
+  updated: 2022-05-05T22:38:41
+
+- title: Pattern Recognition and Machine Learning
+  key: pattern-recognition-and-machine-learning
+  author:
+  - Christopher M. Bishop
+  publisher: Springer
+  year: 2006
+  type: book
+  updated: 2022-11-19T12:08:37
+
+- title: Using Docker
+  key: using-docker
+  author:
+  - Adrian Mouat
+  publisher: O'Reilly
+  year: 2016
+  edition: 1
+  type: book
+  updated: 2023-09-08T22:31:56
+

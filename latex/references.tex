@@ -1,0 +1,866 @@
+\documentclass[
+	programming,
+	short-document,
+	show-notes,
+]{mydocument}
+\begin{document}
+\mytitle{References notes}
+
+\begin{abstract}% [[[
+自分用の参考文献メモ
+\end{abstract}% ]]]
+
+\begin{mytip}% [[[
+\begin{myitemize}
+\1 \texdoc{biblatex-cheatsheet}
+\1 
+\1 
+\end{myitemize}
+\end{mytip}% ]]]
+
+\mytableofcontents
+
+\section{\texttt{references.bib}}% [[[
+
+\subsection{Template}% [[[
+\begin{texcode}
+@type{key,
+  author = "foo",
+  title = "bar",
+  year = 2000, }
+\end{texcode}
+% ]]] End of subsection `Template'.
+
+\subsection{Basic code ???}% [[[
+\begin{myitemize}
+\1 \mycite[page=189]{LaTeX2e美文書作成入門}
+\1 \mycite[page=]{}
+\1 
+\end{myitemize}
+% ]]] End of subsection `Basic code'.
+
+\subsection{type}% [[[
+\begin{myitemize}
+\1 The origin of `type'
+	\2 \texdoc[section=3.1 Entry Types]{bibtex}
+	\2 \texdoc{biblatex-cheatsheet}
+\1 
+\end{myitemize}
+% ]]] End of subsection `type'.
+
+\subsection{key}% [[[
+\begin{myitemize}
+\1 The origin of `key'
+	\2 \texdoc[section=3.2 Fields]{bibtex}の\verb|key|
+	\2 This environment prints the actual bibliography,
+	and the \verb|\bibitem| commands link the entries to the citations via the key, here \verb|jon90|.
+	\texdoc[section=1 Introduction]{natbib}
+\1 基本的にはタイトルをそのまま\verb|key|にする
+	\2 著者名は含めない．もし\verb|key|を著者名から始めると著者名を覚えている必要があるし，
+	複数人の書籍やWebサイトの場合，困るから．
+		\3 同じタイトルのものがある場合，著者名を入れる感じか？
+	\2 日本語タイトルの場合もそのまま日本語で\verb|key|にする
+		\3 英訳にすることが難しいから
+		\3 ローマ字表記にはしない．日本語をローマ字表記したものを\verb|key|にすると，
+		「おう」\myarrow`\verb|o|', `\verb|ou|', `\verb|oh|'などがあり混乱を招くから
+\1 大文字と小文字の違いしかない参照は用いてはならない\mycite[page=352]{teach-yourself-latex2e}．
+	\2 特別な理由がない限り小文字を使用する．理由はいちいちSHIFTキーを押すのが面倒だから
+\1 なお，\verb|key|はVimでは\verb|Ctrl+x, Ctrl+k|で補完できる
+	\2 日本語でも問題なく補完できる
+\1 区切り文字は\doublequotes{\texttt{-}}\texdoc[section=2.1 New BIB\TeX features]{bibtex}
+\end{myitemize}
+% ]]] End of subsection `key'.
+
+\subsection{author}[updated=2022-05-05T21:17:34]% [[[
+\begin{myitemize}
+\1 \verb|author = "北原 康貴"|のように，姓と名の間に半角空白を入れること\mycite[page=361]{独習LaTeX2e}
+\end{myitemize}
+% ]]] End of subsection `author'.
+
+\subsection{note}% [[[
+\begin{myitemize}
+\1 \verb|note = "~~~"|は著者の出身大学を記入することにする
+\1 
+\end{myitemize}
+% ]]] End of subsection `note'.
+
+\subsection{title}% [[[
+\begin{myitemize}
+\1 bookの場合：裏表紙のところを使用する
+\1 websiteの場合：\fbox{F12}でhtml表示したときの\verb|<title> *** </title>|を使用する
+\end{myitemize}
+% ]]] End of subsection `title'.
+
+\subsection{url}% [[[
+urlの箇所は次のようにする．
+\begin{verbatim}
+url = "http://...",
+\end{verbatim}
+hyperrefパッケージの\verb|\url|を使って\verb|url = "\url{http://...}"|としなくても，自動的にハイパーリンクしてくれる．
+% ]]] End of subsection `url'.
+
+\subsection{year}[updated=2022-05-05T19:40:57]% [[[
+\begin{myitemize}
+\1 数字は\verb|"|で囲まない
+\mycite[page=189]{LaTeX2e美文書作成入門},
+\mycite[page=357]{独習LaTeX2e}
+\end{myitemize}
+% ]]] End of subsection `year'.
+
+% ]]] End of section `references.bib'.
+
+\section{\texttt{references.yaml}}% [[[
+\begin{yamlcode}
+category:
+
+- title: Book
+  key: bar
+  author:
+  - A
+  - B
+  publisher: ***
+  year: 2000
+  note:
+  - ***
+  type: book
+  updated: 2022-05-05T18:11:23
+
+- title: Website
+  key: ***
+  type: misc
+  url: https:***
+  updated: 2022-05-05T19:28:17
+
+\end{yamlcode}
+% ]]] End of section `references.yaml'.
+
+\end{document}
+
+%
+% \part{\myverb{myreferences.py}}^^A [[[
+%
+% \section{Science \& Math}^^A [[[
+% \doublequotes{Science \& Math}の由来は
+% \href{https://www.amazon.com/books-used-books-textbooks/b?ie=UTF8&node=283155}{Amazon.com: Books}より．
+%
+% \subsection{Math}^^A [[[
+%
+% \subsubsection{Analysis}^^A [[[
+%
+% \begin{macro}{kaisekinyumon-jo}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='kaisekinyumon-jo',
+    author='松坂 和夫',
+    title='解析入門 上',
+    publisher='岩波書店',
+    year='2018',
+    note='東京大学理学部数学科卒業',)
+%</myreferences.py>
+%<*reference>
+@book{kaisekinyumon-jo,
+	author = "松坂和夫",
+	title = "解析入門 上",
+	publisher = "岩波書店",
+	year = 2018,
+	note = "東京大学理学部数学科卒業",
+}
+%</reference>
+% \end{pythoncode}
+% \end{macro}^^A ]]]
+%
+% \begin{macro}{kaisekinyumon-chu}^^A [[[
+%    \begin{macrocode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='kaisekinyumon-chu',
+    author='松坂 和夫',
+    title='解析入門 中',
+    publisher='岩波書店',
+    year='2018',
+    note='東京大学理学部数学科卒業',)
+%</myreferences.py>
+%<*reference>
+@book{kaisekinyumon-chu,
+	author = "松坂和夫",
+	title = "解析入門 中",
+	publisher = "岩波書店",
+	year = 2018,
+	note = "東京大学理学部数学科卒業",
+}
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% ^^A ]]] End of subsubsection `Analysis'.
+%
+% \begin{macro}{principles-of-mathematical-analysis}^^A [[[
+% \href{https://en.wikipedia.org/wiki/Walter_Rudin}{Wikipedia}によると，
+% この本は世界規模で数学教育に影響を与えているらしい．
+%    \begin{macrocode}
+%<*reference>
+@book{principles-of-mathematical-analysis,
+	author = "Walter Rudin",
+	title = "Principle of Mathematical Analysis",
+	edition = "3",
+}
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% \subsubsection{数学A}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='数学A',
+    title='数学A',
+    publisher='数研出版',
+    year='2006',
+    )
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `数学A'.
+%
+% \subsubsection{数学B}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='数学B',
+    title='数学B',
+    publisher='数研出版',
+    year='2007',
+    )
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `数学B'.
+%
+% \subsubsection{数学C}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='数学C',
+    title='数学C',
+    publisher='数研出版',
+    year='2007',
+    )
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `数学C'.
+%
+% ^^A ]]] End of subsection `Math'.
+%
+% \subsection{Science}^^A [[[
+%
+% \subsubsection{Classical mechanics}^^A [[[
+% \myemph{Classical Mechanics} is a textbook about that subject written by Herbert Goldstein,
+% a professor at Columbia University.
+% Intended for advanced undergraduate and beginning graduate students,
+% it has been one of the standard references in its subject around the world
+% since its first publication in 1951 \mycite[keyword=Classical Mechanics (Goldstein)]{wikipedia}.
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='classical-mechanics',
+    author='Herbert Goldstein',
+    title='Classical Mechanics',
+    publisher='Addison-Wesley',
+    edition='3', )
+%</myreferences.py>
+% \end{macrocode}
+% ^^A ]]] End of subsubsection `Classical mechanics'.
+%
+%
+% \subsubsection{Quantum mechanics}^^A [[[
+% \myemph{Quantum Computation and Quantum Information} is a textbook about quantum information science
+% written by Michael Nielsen and Isaac Chuang, regarded as a standard text on the subject
+% \mycite[keyword=Quantum Computation and Quantum Information]{wikipedia}
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='quantum-computation-and-quantum-information',
+    author='Michael A. Nielsen \& Isaac L. Chuang',
+    title='Quantum Computation and Quantum Information',
+    publisher='Cambridge University Press',
+    edition='10', )
+%</myreferences.py>
+% \end{macrocode}
+% ^^A ]]] End of subsubsection `Quantum mechanics'.
+%
+%
+%
+%
+% ^^A ]]] End of subsection `Science'.
+%
+%
+%
+%
+%
+%
+% ^^A ]]] End of section `Science & Math'.
+%
+% \section{Computers \& Technology}^^A [[[
+%
+% \begin{concealableitemize}^^A [[[
+% \1 \doublequotes{Computers \& Technology}の由来
+%   \2 \urlref{https://www.amazon.com/books-used-books-textbooks/b?ie=UTF8&node=283155}{Amazon.com: Books}
+% \end{concealableitemize}^^A ]]]
+%
+% \subsection{Bash}^^A [[[
+%
+% \subsubsection{learning-the-bash-shell}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='learning-the-bash-shell',
+    author='Cameron Newham and Bill Rosenblatt',
+    title='Learning the bash Shell',
+    publisher="O'Reilly",
+    year='2005', )
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `learning-the-bash-shell'.
+%
+% ^^A ]]] End of subsection `Bash'.
+%
+% \subsection{C/C++}^^A [[[
+%
+% \begin{macro}{pep-7-style-guide-for-c-code'}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='misc',
+    key='pep-7-style-guide-for-c-code',
+    title='PEP 7 -- Style Guide for C Code',
+    url='https://www.python.org/dev/peps/pep-0007/',
+    )
+%</myreferences.py>
+% \end{pythoncode}
+% \end{macro}^^A ]]]
+%
+% \begin{macro}{teach-yourself-c}^^A [[[
+%    \begin{macrocode}
+%<*myreferences.bib>
+@book{teach-yourself-c,
+	author = "ハーバート・シルト",
+	title = "独習C",
+	publisher = "翔泳社",
+	year = 2014,
+}
+%</myreferences.bib>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% \begin{macro}{teach-yourself-cpp}^^A [[[
+% \doublequotes{c++}とすると補完しないので\doublequotes{cpp}とした．
+%    \begin{macrocode}
+%<*reference>
+@book{teach-yourself-cpp,
+	author = "ハーバート・シルト",
+	title = "独習C++",
+	publisher = "翔泳社",
+	year = 2014,
+}
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% ^^A ]]] End of subsection `C/C++'.
+%
+% \subsection{Git}^^A [[[
+%
+%
+% \begin{macro}{version-control-with-git}^^A [[[
+%    \begin{macrocode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='version-control-with-git',
+    author='Jon Loeliger and Matthew McCullough',
+    title='Version Control with Git',
+    publisher="O'Reilly",
+    year='2012', )
+%</myreferences.py>
+%    \end{macrocode}
+%
+%
+%
+%    \begin{macrocode}
+%<*myreferences.bib>
+@book{version-control-with-git,
+    author = "Jon Loeliger and Matthew McCullough",
+    title = "Version Control with Git",
+    publisher = "O'Reilly",
+    year = 2012,
+}
+%</myreferences.bib>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% ^^A ]]] End of subsection `Git'.
+%
+% \subsection{Python}^^A [[[
+%
+% \begin{macro}{pep-8-style-guide-for-python-code'}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='misc',
+    key='pep-8-style-guide-for-python-code',
+    title='PEP 8 -- Style Guide for Python Code',
+    url='https://www.python.org/dev/peps/pep-0008/',
+    )
+%</myreferences.py>
+% \end{pythoncode}
+% \end{macro}^^A ]]]
+%
+% \begin{macro}{introducting-python}^^A [[[
+%    \begin{macrocode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='introducting-python',
+    author='Bill Lubanovic',
+    title='Introducting Python',
+    publisher="O'Reilly",
+    year='2014',
+)
+%</myreferences.py>
+%    \end{macrocode}
+%
+%
+%
+%    \begin{macrocode}
+%<*reference>
+@book{introducting-python,
+	author = "Bill Lubanovic",
+	title = "Introducting Python",
+	publisher = "O'Reilly",
+	year = 2014 }
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% \begin{macro}{learning-python}^^A [[[
+%    \begin{macrocode}
+%<*reference>
+@book{learning-python,
+	author = "Mark Lutz",
+	title = "Learning Python",
+	publisher = "O'Reilly",
+	year = 2013,
+	edition = "7", }
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% \begin{macro}{programming-python}^^A [[[
+%    \begin{macrocode}
+%<*reference>
+@book{programming-python,
+	author = "Mark Lutz",
+	title = "Programming Python",
+	publisher = "O'Reilly",
+	year = 2010,
+	edition = "4", }
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% \begin{macro}{python-documentation}^^A [[[
+%    \begin{macrocode}
+%<*reference>
+@misc{python-documentation,
+	title = "Python documentation",
+	url = "https://docs.python.org/",
+	howpublished = "URL: \url{https://docs.python.org/}", }% この行は一時的
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% \begin{macro}{automate-the-boring-stuff-with-python}^^A [[[
+%    \begin{macrocode}
+%<*reference>
+@book{automate-the-boring-stuff-with-python,
+	author = "Al Sweigart",
+	title = "AUTOMATE THE BORING STUFF WITH PYTHON",
+	publisher = "no starch press",
+	year = 2015 }
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% ^^A ]]] End of subsection `Python'.
+%
+% \subsection{Machine learning}^^A [[[
+%
+% \subsubsection{Understanding Machine Learning}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='understanding-machine-learning-from-theory-to-algorithms',
+    author='Shai Shalev-Shwartz, Shai Ben-David',
+    title='Understanding Machine Learning From Theory To Algorithms',
+    publisher='Cambridge University Press',
+    year='2014', )
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `Understanding Machine Learning'.
+%
+% \subsubsection{deep-learning-from-scratch}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 The origin of `\verb|deep-learning-from-scratch|'
+%   \2 \url{https://github.com/oreilly-japan/deep-learning-from-scratch}
+%   \mycite[page=vii]{deep-learning-from-scratch}
+% \end{myitemize}
+%
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='deep-learning-from-scratch',
+    author='斎藤 康毅',
+    title='ゼロから作るDeep Learning --- Pythonで学ぶディープラーニングの理論と実装',
+    publisher='オライリー・ジャパン',
+    year='2020',
+    note='東京工業大学工学部卒，東京大学大学院学際情報学府修士課程修了', )
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `deep-learning-from-scratch'.
+%
+% ^^A ]]] End of subsection `Machine learning'.
+%
+% \subsection{\TeX}^^A [[[
+%
+% \begin{macro}{latexmk}^^A [[[
+%    \begin{macrocode}
+%<*reference>
+@misc{latexmk,
+    title = "LATEXMK",
+    howpublished = "\href{run:/usr/share/doc/latexmk/latexmk.pdf}{\texttt{latexmk.pdf}}", }
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% ^^A ]]] End of subsection `\TeX'.
+%
+% \subsection{Windows}^^A [[[
+%
+%
+%
+% \subsubsection{Excel}^^A [[[
+%
+% \begin{macro}{excel-function-zenjiten}^^A [[[
+%
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='excel-function-zenjiten',
+    author='羽山博 吉川明広',
+    title='できるポケットExcel関数全辞典',
+    publisher='株式会社インプレス',
+    year='2015', )
+%</myreferences.py>
+% \end{pythoncode}
+% \end{macro}^^A ]]]
+%
+% \begin{macro}{excel-vba-programming-for-dummies}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+  type='book',
+  key='excel-vba-programming-for-dummies',
+  author='John Walkenbach',
+  title='Excel VBA Programming For Dummies',
+  publisher='John Wiley \& Sons, Inc.',
+  year='2013',
+  edition='3', )
+%</myreferences.py>
+% \end{pythoncode}
+% \end{macro}^^A ]]]
+%
+% ^^A ]]] End of subsubsection `Excel'.
+%
+% ^^A ]]] End of subsection `Windows'.
+%
+% \subsection{etc.}^^A [[[
+%
+% \subsubsection{using-docker}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='using-docker',
+    author='Adrian Mouat',
+    title='Using Docker',
+    publisher="O'Reilly",
+    year='2016',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `using-docker'.
+%
+% \subsubsection{pc-jisaku-tune-up-toranomaki-2020}^^A [[[
+% 以下の情報は\mycite[page=512]{pc-jisaku-tune-up-toranomaki-2020}
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='pc-jisaku-tune-up-toranomaki-2020',
+    author='小川 亨',
+    title='PC自作・チューンナップ虎の巻二〇二〇',
+    publisher='株式会社インプレス',
+    year='2019',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `pc-jisaku-tune-up-toranomaki-2020'.
+%
+% ^^A ]]] End of subsection `etc.'.
+%
+% ^^A ]]] End of section `Computers & Technology'.
+%
+% \section{English}^^A [[[
+%
+% \begin{concealablenote}^^A [[[
+% \doublequotes{English}の由来は自分で決めた（特に変更する必要はないと思う）
+% \end{concealablenote}^^A ]]]
+%
+% \subsection{Dictionary}^^A [[[
+% \href{https://en.wikipedia.org/wiki/Comparison_of_English_dictionaries}{ここ}に各辞書が比較さてれいる．
+%
+% \subsubsection{lexico}^^A [[[
+% \href{https://www.lexico.com/about}{About}
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='misc',
+    key='lexico',
+    title='LEXICO',
+    note='powered by OXFORD',
+    url='https://www.lexico.com/',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `lexico'.
+%
+% \subsubsection{oxford-learners-dictionaries}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='misc',
+    key='oxford-learners-dictionaries',
+    title="Oxford Learner's Dictionaries",# double quotesにしないとエラー
+    url='https://www.oxfordlearnersdictionaries.com/',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `oxford-learners-dictionaries'.
+%
+% \subsubsection{longman}^^A [[[
+% \href{https://www.ldoceonline.com/about.html}{About}
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='misc',
+    key='longman',
+    title='Longman Dictionary of Contemporary English',
+    url='http://www.ldoceonline.com/',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `longman'.
+%
+% \subsubsection{cambridge-dictionary}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='misc',
+    key='cambridge-dictionary',
+    title='Cambridge Dictionary',
+    url='https://dictionary.cambridge.org/',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `cambridge-dictionary'.
+%
+% \subsubsection{genius}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='genius',
+    author='小西 友七',
+    title='ジーニアス英和辞典',
+    publisher='大修館書店',
+    year='2001', )
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `genius'.
+%
+% \begin{macro}{newbury-house-dictionary}^^A [[[
+%    \begin{macrocode}
+%<*reference>
+@book{newbury-house-dictionary,
+	author = "Philip M. Rideout",
+	title = "Heinle's Newbury House Dictionary of American English",
+	edition = "4",
+}
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+% \subsubsection{weblio}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='misc',
+    key='weblio',
+    title='weblio 英和辞典・和英辞典',
+    url='https://ejje.weblio.jp/',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `weblio'.
+%
+%
+%
+% ^^A ]]] End of subsection `Dictionary'.
+%
+% \subsection{Grammar}^^A [[[
+%
+% \subsubsection{ロイヤル英文法}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='royal-english-grammar',
+    author='綿貫 陽，宮川 幸久',
+    title='徹底例解ロイヤル英文法',
+    publisher='旺文社', )
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `ロイヤル英文法'.
+%
+% \begin{macro}{maintop}^^A [[[
+%    \begin{macrocode}
+%<*reference>
+@book{maintop,
+	author = "生田 友七",
+	title = "MAINTOP総合英語",
+	publisher = "山口書店",
+	year = 2007,
+	note = "南山大学外国語学部英米学科卒業", }
+%</reference>
+%    \end{macrocode}
+% \end{macro}^^A ]]]
+%
+%
+%
+%
+% ^^A ]]] End of subsection `Grammar'.
+%
+% \subsection{Wordbook}^^A [[[
+%
+% \begin{concealablenote}^^A [[[
+% \doublequotes{wordbook} \urlref{https://eikaiwa.dmm.com/uknow/questions/63183/}{単語帳って英語でなんて言うの？}
+% \end{concealablenote}^^A ]]]
+%
+% \subsubsection{単語王}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='tangoou-2202',
+    author='中澤 一',
+    title='単語王2202',
+    publisher='株式会社 オー・メソッド出版', )
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `単語王'.
+%
+%
+%
+%
+%
+% ^^A ]]] End of subsection `Wordbook'.
+%
+% ^^A ]]] End of section `English'.
+%
+% \section{Business}^^A [[[
+% \doublequotes{Business}の由来はAmazon.com: Booksより．
+%
+% \subsection{businessdou-life}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='businessdou-life',
+    author='内山 早苗',
+    title='{\\small 新社会人基本}Newビジネス道PLUS「体」',
+    publisher='株式会社 日本能率協会マネジメントセンター',
+    year='2016',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsection `businessdou-life'.
+%
+% \subsection{businessdou-mind}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='businessdou-mind',
+    author='内山 早苗',
+    title='{\\small 新社会人基本}Newビジネス道PLUS「心」',
+    publisher='株式会社 日本能率協会マネジメントセンター',
+    year='2016',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsection `businessdou-mind'.
+%
+% \subsection{businessdou-skill}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='businessdou-skill',
+    author='内山 早苗',
+    title='{\\small 新社会人基本}Newビジネス道PLUS「技」',
+    publisher='株式会社 日本能率協会マネジメントセンター',
+    year='2016',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsection `businessdou-skill'.
+%
+% \subsection{中堅社員研修}^^A [[[
+% \begin{pythoncode}
+%<*myreferences.py>
+add_ref(
+    type='book',
+    key='中堅社員研修',
+    title='中堅社員研修',
+    publisher='日本能率協会マネジメントセンター',)
+%</myreferences.py>
+% \end{pythoncode}
+% ^^A ]]] End of subsection `中堅社員研修'.
+%
+% ^^A ]]] End of section `Business'.
+%
+%    \begin{macrocode}
+%<*reference>
+@book{mechanics-of-materials,
+    author = "日本機械学会",
+    title = "材料力学",
+    publisher = "日本機械学会",
+    year = 2016 }
+%</reference>
+%    \end{macrocode}
+%
+%
+%
+%
+% ^^A ]]] End of part `myreferences.py'.
+%
