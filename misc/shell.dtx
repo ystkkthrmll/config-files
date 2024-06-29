@@ -289,7 +289,7 @@ fi
 % \end{myitemize}
 %
 % \begin{bashcode}
-filename="file:///home/yasutaka/Dropbox/configuration-files/miscellaneous/output-files/shell/wallpaper-${extension}.png"
+filename="file:///home/yasutaka/Dropbox/config-files/misc/output-files/shell/wallpaper-${extension}.png"
 gsettings set org.gnome.desktop.background picture-uri ${filename}
 % \end{bashcode}
 % ^^A ]]] End of subsection `org.gnome.desktop.background'.
@@ -626,7 +626,7 @@ fi
 %
 % \subsection{Creating pdf file}^^A [[[
 % \begin{bashcode}
-latexmk ~/Dropbox/configuration-files/latex/output-files/miscellaneous/wallpaper-${extension}.tex
+latexmk ~/Dropbox/config-files/latex/output-files/misc/wallpaper-${extension}.tex
 % \end{bashcode}
 % ^^A ]]] End of subsection `Creating pdf file'.
 %
@@ -736,7 +736,7 @@ fi
 %
 % \begin{bashcode}
 texmflocal=$(kpsewhich -expand-braces='$TEXMFLOCAL')
-configuration_latex=~/Dropbox/config-files/latex/output-files
+config_latex=~/Dropbox/config-files/latex/output-files
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `Defining variables'.
 %
@@ -764,22 +764,22 @@ sudo mkdir -p ${texmflocal}/bibtex/bib
 % \end{myitemize}
 %
 % \begin{bashcode}
-sudo ln -f -s ${configuration_latex}/classes/mydocument.cls ${texmflocal}/tex/mydocument.cls
-sudo ln -f -s ${configuration_latex}/classes/mydtxfile.cls ${texmflocal}/tex/mydtxfile.cls
-sudo ln -f -s ${configuration_latex}/classes/myslides.cls ${texmflocal}/tex/myslides.cls
-sudo ln -f -s ${configuration_latex}/classes/mywallpaper.cls ${texmflocal}/tex/mywallpaper.cls
-sudo ln -f -s ${configuration_latex}/misc/mydocstrip.tex ${texmflocal}/tex/mydocstrip.tex
+sudo ln -f -s ${config_latex}/classes/mydocument.cls ${texmflocal}/tex/mydocument.cls
+sudo ln -f -s ${config_latex}/classes/mydtxfile.cls ${texmflocal}/tex/mydtxfile.cls
+sudo ln -f -s ${config_latex}/classes/myslides.cls ${texmflocal}/tex/myslides.cls
+sudo ln -f -s ${config_latex}/classes/mywallpaper.cls ${texmflocal}/tex/mywallpaper.cls
+sudo ln -f -s ${config_latex}/misc/mydocstrip.tex ${texmflocal}/tex/mydocstrip.tex
 % \end{bashcode}
 %
 % \begin{bashcode}
-sudo ln -f -s ${configuration_latex}/packages/myenglish.sty ${texmflocal}/tex/myenglish.sty
-sudo ln -f -s ${configuration_latex}/packages/mygraphic.sty ${texmflocal}/tex/mygraphic.sty
-sudo ln -f -s ${configuration_latex}/packages/mymath.sty ${texmflocal}/tex/mymath.sty
-sudo ln -f -s ${configuration_latex}/packages/myprogramming.sty ${texmflocal}/tex/myprogramming.sty
+sudo ln -f -s ${config_latex}/packages/myenglish.sty ${texmflocal}/tex/myenglish.sty
+sudo ln -f -s ${config_latex}/packages/mygraphic.sty ${texmflocal}/tex/mygraphic.sty
+sudo ln -f -s ${config_latex}/packages/mymath.sty ${texmflocal}/tex/mymath.sty
+sudo ln -f -s ${config_latex}/packages/myprogramming.sty ${texmflocal}/tex/myprogramming.sty
 % \end{bashcode}
 %
 % \begin{bashcode}
-sudo ln -f -s ${configuration_latex}/references/myreferences.bib ${texmflocal}/bibtex/bib/myreferences.bib
+sudo ln -f -s ${config_latex}/references/myreferences.bib ${texmflocal}/bibtex/bib/myreferences.bib
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `Making symbolic links'.
 %
@@ -798,55 +798,55 @@ sudo texhash
 %
 % \subsubsection{\texttt{.latexmkrc}}[updated=2021-12-19T15:22:20]^^A [[[
 % \begin{bashcode}
-ln -f -s ${configuration_latex}/misc/.latexmkrc ~/.latexmkrc
+ln -f -s ${config_latex}/misc/.latexmkrc ~/.latexmkrc
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `.latexmkrc'.
 %
 % ^^A ]]] End of subsection `LaTeX'.
 %
-% \subsection{miscellaneous}[updated=2021-12-19T15:29:16]^^A [[[
+% \subsection{misc}[updated=2021-12-19T15:29:16]^^A [[[
 %
 % \subsubsection{Defining variables}[updated=2022-01-09T10:40:45]^^A [[[
 % \begin{bashcode}
-configuration_miscellaneous=~/Dropbox/config-files/misc/output-files
+config_misc=~/Dropbox/config-files/misc/output-files
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `Defining variables'.
 %
 % \subsubsection{Git}[updated=2021-12-19T15:23:14]^^A [[[
 % \begin{bashcode}
-ln -f -s ${configuration_miscellaneous}/misc/.gitconfig.${extension} ~/.gitconfig
+ln -f -s ${config_misc}/misc/.gitconfig.${extension} ~/.gitconfig
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `Git'.
 %
 % \subsubsection{Zsh}[updated=2021-12-19T15:23:42]^^A [[[
 % \begin{bashcode}
-ln -f -s ${configuration_miscellaneous}/shell/.zshrc ~/.zshrc
+ln -f -s ${config_misc}/shell/.zshrc ~/.zshrc
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `Zsh'.
 %
 % \subsubsection{GNOME/Files bookmarks}[updated=2021-12-19T15:25:25]^^A [[[
 % \begin{bashcode}
-ln -f -s ${configuration_miscellaneous}/misc/bookmarks.${extension} ~/.config/gtk-3.0/bookmarks
+ln -f -s ${config_misc}/misc/bookmarks.${extension} ~/.config/gtk-3.0/bookmarks
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `GNOME/Files bookmarks'.
 %
 % \subsubsection{autostart}[updated=2021-12-19T15:28:15]^^A [[[
 % \begin{bashcode}
 autostart=~/.config/autostart
-ln -f -s ${configuration_miscellaneous}/misc/analog-clock.desktop ${autostart}/analog-clock.desktop
-ln -f -s ${configuration_miscellaneous}/misc/gnome-terminal.desktop ${autostart}/gnome-terminal.desktop
-ln -f -s ${configuration_miscellaneous}/misc/google-chrome.desktop ${autostart}/google-chrome.desktop
+ln -f -s ${config_misc}/misc/analog-clock.desktop ${autostart}/analog-clock.desktop
+ln -f -s ${config_misc}/misc/gnome-terminal.desktop ${autostart}/gnome-terminal.desktop
+ln -f -s ${config_misc}/misc/google-chrome.desktop ${autostart}/google-chrome.desktop
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `autostart'.
 %
 % \subsubsection{config}[updated=]^^A [[[
 % \begin{bashcode}
 ssh_config=~/.ssh
-ln -f -s ${configuration_miscellaneous}/misc/config.${extension} ${ssh_config}/config
+ln -f -s ${config_misc}/misc/config.${extension} ${ssh_config}/config
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `config'.
 %
-% ^^A ]]] End of subsection `miscellaneous'.
+% ^^A ]]] End of subsection `misc'.
 %
 % \subsection{pandoc}[updated=]^^A [[[
 %
@@ -877,7 +877,7 @@ ln -f -s ${src_pandoc}/defaults/report-from-markdown-to-latex.yaml ${dest_pandoc
 %
 % \subsubsection{Defining variables}[updated=]^^A [[[
 % \begin{bashcode}
-configuration_python=~/Dropbox/configuration-files/miscellaneous/output-files/python
+config_python=~/Dropbox/config-files/misc/output-files/python
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `Defining variables'.
 %
@@ -892,7 +892,7 @@ configuration_python=~/Dropbox/configuration-files/miscellaneous/output-files/py
 % \end{myitemize}
 %
 % \begin{bashcode}
-ln -f -s ${configuration_python}/my_module.py ~/.local/lib/python3.10/site-packages/my_module.py
+ln -f -s ${config_python}/my_module.py ~/.local/lib/python3.10/site-packages/my_module.py
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `Modules'.
 %
@@ -902,7 +902,7 @@ ln -f -s ${configuration_python}/my_module.py ~/.local/lib/python3.10/site-packa
 %
 % \subsubsection{Defining variables}[updated=2021-12-19T15:33:24]^^A [[[
 % \begin{bashcode}
-configuration_vim=~/Dropbox/config-files/vim/output-files
+config_vim=~/Dropbox/config-files/vim/output-files
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `Defining variables'.
 %
@@ -914,8 +914,8 @@ configuration_vim=~/Dropbox/config-files/vim/output-files
 %
 % \begin{bashcode}
 mkdir -p ~/.config/nvim
-ln -f -s ${configuration_vim}/config-files/init.vim ~/.config/nvim/init.vim
-ln -f -s ${configuration_vim}/config-files/.NERDTreeBookmarks.${extension} ~/.NERDTreeBookmarks
+ln -f -s ${config_vim}/config-files/init.vim ~/.config/nvim/init.vim
+ln -f -s ${config_vim}/config-files/.NERDTreeBookmarks.${extension} ~/.NERDTreeBookmarks
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `init.vim'.
 %
@@ -928,16 +928,16 @@ ln -f -s ${configuration_vim}/config-files/.NERDTreeBookmarks.${extension} ~/.NE
 % \begin{bashcode}
 ftplugin=~/.config/nvim/after/ftplugin
 mkdir -p ${ftplugin}
-ln -f -s ${configuration_vim}/ftplugin/css.vim ${ftplugin}
-ln -f -s ${configuration_vim}/ftplugin/dot.vim ${ftplugin}
-ln -f -s ${configuration_vim}/ftplugin/html.vim ${ftplugin}
-ln -f -s ${configuration_vim}/ftplugin/java.vim ${ftplugin}
-ln -f -s ${configuration_vim}/ftplugin/json.vim ${ftplugin}
-ln -f -s ${configuration_vim}/ftplugin/markdown.vim ${ftplugin}
-ln -f -s ${configuration_vim}/ftplugin/pu.vim ${ftplugin}
-ln -f -s ${configuration_vim}/ftplugin/python.vim ${ftplugin}
-ln -f -s ${configuration_vim}/ftplugin/tex.vim ${ftplugin}
-ln -f -s ${configuration_vim}/ftplugin/yaml.vim ${ftplugin}
+ln -f -s ${config_vim}/ftplugin/css.vim ${ftplugin}
+ln -f -s ${config_vim}/ftplugin/dot.vim ${ftplugin}
+ln -f -s ${config_vim}/ftplugin/html.vim ${ftplugin}
+ln -f -s ${config_vim}/ftplugin/java.vim ${ftplugin}
+ln -f -s ${config_vim}/ftplugin/json.vim ${ftplugin}
+ln -f -s ${config_vim}/ftplugin/markdown.vim ${ftplugin}
+ln -f -s ${config_vim}/ftplugin/pu.vim ${ftplugin}
+ln -f -s ${config_vim}/ftplugin/python.vim ${ftplugin}
+ln -f -s ${config_vim}/ftplugin/tex.vim ${ftplugin}
+ln -f -s ${config_vim}/ftplugin/yaml.vim ${ftplugin}
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `ftplugin'.
 %
@@ -958,9 +958,9 @@ ln -f -s ${configuration_vim}/ftplugin/yaml.vim ${ftplugin}
 % \begin{bashcode}
 syntax=~/.config/nvim/after/syntax
 mkdir -p ${syntax}
-ln -f -s ${configuration_vim}/syntax/dot.vim ${syntax}
-ln -f -s ${configuration_vim}/syntax/python.vim ${syntax}
-ln -f -s ${configuration_vim}/syntax/tex.vim ${syntax}
+ln -f -s ${config_vim}/syntax/dot.vim ${syntax}
+ln -f -s ${config_vim}/syntax/python.vim ${syntax}
+ln -f -s ${config_vim}/syntax/tex.vim ${syntax}
 % \end{bashcode}
 % ^^A ]]] End of subsubsection `Syntax files'.
 %
