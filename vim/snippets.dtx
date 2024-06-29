@@ -1,0 +1,961 @@
+%
+% ^^A Configuring DocStrip [[[
+% \iffalse
+%<*driver>
+\input mydocstrip
+\mygenerate[output-files/snippets]{
+  all.snippets,
+  tex.snippets,
+  yaml.snippets,
+}
+\myendbatchfile
+\mydriver[
+  show-notes,
+]
+%</driver>
+% \fi
+% ^^A ]]] End of Configuring DocStrip
+%
+% \mytitle{Snippets}
+%
+% \begin{abstract}^^A [[[
+% 自作スニペット集．
+% \doublequotes{snippets}の由来は\vimhelp{neosnippet-introduction}．
+% \end{abstract}^^A ]]]
+%
+% \mytableofcontents
+%
+% \part{Notes}^^A [[[
+%
+% \section{Introduction}^^A [[[
+%
+% \subsection{What's snippet?}^^A [[[
+% スニペットとは，小片，切れ端，断片，抜粋，切り抜きなどの意味を持つ英単語．
+% プログラミングの分野では，様々なプログラムに挿入して利用することができる，
+% 特定の機能を実現した短いコードのまとまりのことをコードスニペットあるいは単にスニペットという．
+% プログラミングでは様々なプログラムで似たような（機能を実装する）コードを記述する場面は数多くあるため，
+% よく使うコードをスニペットとして切り貼りし「使いまわす」ことで開発効率を向上することができる
+% \mycite[keyword=スニペット]{e-words}．
+% ^^A ]]] End of subsection `What's snippet?'.
+%
+% スニペットのプラグインはneosnippetを選んだ．
+% ^^A ]]] End of section `Introduction'.
+%
+% \section{Syntax}^^A [[[
+% タイトルの由来を記せ．今はテキトーに決めた．
+%
+% 文法参照先：\vimhelp{UltiSnips-basic-syntax}
+%
+% \begin{myitemize}
+% \1 \href{https://developpaper.com/vim-code-snippet-plug-in-ultisnips-usage-tutorial/}{VIM code snippet plug-in ultisnips usage tutorial}
+% \1 
+% \end{myitemize}
+% ^^A ]]] End of section `Syntax'.
+%
+% ^^A ]]] End of part `Notes'.
+%
+% \part{\texttt{all.snippets}}^^A [[[
+%
+% \iffalse
+%<*all.snippets>
+% \fi
+%
+% \section{datetime}^^A [[[
+% \begin{myitemize}
+% \1 references
+%   \2 \href{https://jdhao.github.io/2019/12/22/ultisnips_avoid_content_update/}{Creating Markdown Front Matter with Ultisnips}
+% \end{myitemize}
+%
+% \begin{vimcode}
+snippet datetime "ISO 8601" i
+`!v strftime("%Y-%m-%dT%H:%M:%S")`
+endsnippet
+
+snippet dt "ISO 8601" i
+`!v strftime("%Y-%m-%dT%H:%M:%S")`
+endsnippet
+% \end{vimcode}
+% ^^A ]]] End of section `datetime'.
+%
+%
+%
+%
+%
+% \begin{vimcode}
+snippet text "URL text=..."
+:~:text=
+endsnippet
+% \end{vimcode}
+%
+%
+% \iffalse
+%</all.snippets>
+% \fi
+%
+% ^^A ]]] End of part `all.snippets'.
+%
+% \part{\texttt{tex.snippets}}^^A [[[
+%
+% \section{Basic Structures}^^A [[[
+%
+% \subsubsection{docstrip}^^A [[[
+% \begin{myitemize}
+% \1 \verb|End of ... `***'.|
+%   \2 \href{run:/usr/share/texlive/texmf-dist/tex/latex/base/article.cls}{article.cls}
+% \1 \verb|`expand("%:t")`|
+%   \2 \href{http://dackdive.hateblo.jp/entry/2016/01/20/144530}{ここ}
+% \1 The origin of `Configuring DocStrip'
+%   \2 \texdoc[section=3 Configuring DocStrip]{docstrip}
+% \end{myitemize}
+%
+%    \begin{macrocode}
+%<*tex.snip>
+snippet docstrip
+alias mydocstrip
+    %
+    % ^^A Configuring DocStrip [[[
+    % \iffalse
+    %<*driver>
+    \input mydocstrip
+    \mygenerate{$1}
+    % \myendbatchfile
+    \mydriver[
+      show-notes,
+    ]
+    %</driver>
+    % \fi
+    % ^^A ]]] End of Configuring DocStrip
+    %
+    % \mytitle{$2}
+    %
+    % \begin{abstract}^^A [[[
+    %
+    % \end{abstract}^^A ]]]
+    %
+    % \mytableofcontents
+    %
+    %
+    %
+    %
+    %
+    %
+    % ^^A End of file \``expand("%:t")`'.
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsubsection `docstrip'.
+%
+% \subsubsection{documentclass-main}^^A [[[
+%    \begin{macrocode}
+%<*tex.snip>
+snippet documentclass-main
+alias \documentclass-main
+    \documentclass{mydocument}
+    \begin{document}
+    \mytitle{${1}}
+    
+    \begin{abstract}% [[[
+    
+    \end{abstract}% ]]]
+    
+    \mytableofcontents
+    
+    \myinput{${0}}
+    
+    
+    
+    \end{document}
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsubsection `documentclass-main'.
+%
+% \subsubsection{documentclass-sub}^^A [[[
+%
+%    \begin{macrocode}
+%<*tex.snip>
+snippet documentclass-sub
+alias \documentclass-sub
+    \documentclass[
+      show-notes,
+    ]{mydocument}
+    \begin{document}
+    ${0}
+    
+    
+    
+    \end{document}
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsubsection `documentclass-sub'.
+%
+% \subsubsection{preamble}^^A [[[
+%    \begin{macrocode}
+%<*tex.snip>
+snippet preamble
+    % preamble [[[
+    ${0}
+    % ]]] End of preamble.
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsubsection `preamble'.
+%
+% \subsubsection{block}^^A [[[
+%    \begin{macrocode}
+%<*tex.snip>
+snippet block
+    % block `${1}' [[[
+    ${0}
+    % ]]] End of block `$1'.
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsubsection `block'.
+%
+% \subsubsection{includeonly}^^A [[[
+%    \begin{macrocode}
+%<*tex.snip>
+snippet includeonly
+# alias \includeonly
+    \includeonly{% [[[
+        source-files/${0},
+        % source-files/,
+        % source-files/,
+    }% ]]]
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsubsection `includeonly'.
+%
+% \subsubsection{subfile}^^A [[[
+% 
+%    \begin{macrocode}
+%<*tex.snip>
+snippet subfile
+alias \subfile
+    \subfile{source-files/${0}}
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsubsection `subfile'.
+%
+% \subsubsection{bibliographystyle}^^A [[[
+%    \begin{macrocode}
+%<*tex.snip>
+snippet bibliographystyle
+    \bibliographystyle{unsrt}
+    \bibliography{myreferences}
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsubsection `'.
+%
+% \subsubsection{preface}^^A [[[
+%    \begin{macrocode}
+%<*tex.snip>
+snippet preface
+    \maketitle
+    
+    \begin{abstract}% [[[
+    ${0}
+    \end{abstract}% ]]]
+
+    \tableofcontents
+    \newpage
+
+    % End of file `preface.tex'.
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsubsection `'.
+%
+% ^^A ]]] End of section `Basic Structures'.
+%
+% \section{Sections}^^A [[[
+% \doublequotes{Chapters and Sections}の由来は\texdoc{classes}より．
+%
+% \subsection{section}^^A [[[
+%    \begin{macrocode}
+%<*tex.snip>
+snippet section
+alias \section
+    \section{${1}}% [[[
+    ${0}
+    % ]]] End of section `$1'.
+%
+snippet section-dtx
+alias \section-dtx
+    % \section{${1}}^^A [[[
+    % ${0}
+    %
+    % ^^A ]]] End of section `$1'.
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsection `section'.
+%
+% \subsection{subsection}^^A [[[
+%    \begin{macrocode}
+%<*tex.snip>
+snippet subsection
+alias \subsection
+    \subsection{${1}}% [[[
+    ${0}
+    % ]]] End of subsection `$1'.
+%
+snippet subsection-dtx
+alias \subsection-dtx
+    % \subsection{${1}}^^A [[[
+    % ${0}
+    %
+    % ^^A ]]] End of subsection `$1'.
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsection `subsection'.
+%
+% \subsection{subsubsection}^^A [[[
+%    \begin{macrocode}
+%<*tex.snip>
+snippet subsubsection
+alias \subsubsection
+    \subsubsection{${1}}% [[[
+    ${0}
+    % ]]] End of subsubsection `$1'.
+%
+snippet subsubsection-dtx
+alias \subsubsection-dtx
+    % \subsubsection{${1}}^^A [[[
+    % ${0}
+    %
+    % ^^A ]]] End of subsubsection `$1'.
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsection `subsubsection'.
+%
+% \subsection{paragraph}^^A [[[
+%    \begin{macrocode}
+%<*tex.snip>
+snippet paragraph
+alias   \paragraph
+    \paragraph{${1}}% [[[
+    ${0}
+    
+    % ]]] End of paragraph `$1'.
+%</tex.snip>
+%    \end{macrocode}
+% ^^A ]]] End of subsection `paragraph'.
+%
+% ^^A ]]] End of section `Sections'.
+%
+% \section{etc.}^^A [[[
+%
+% ^^A ]]] End of section `etc.'.
+%
+% \iffalse
+%<*tex.snippets>
+% \fi
+%
+% \section{Basic structures}^^A [[[
+%
+% \begin{concealableitemize}^^A [[[
+% \1 The origin of `Basic Structures'
+%   \2 \href{https://ejje.weblio.jp/content/%E5%9F%BA%E6%9C%AC%E6%A7%8B%E9%80%A0}{ここ}
+% \end{concealableitemize}^^A ]]]
+%
+%
+%
+%
+%
+%
+%
+% \subsubsection{etc.}^^A [[[
+%
+% \subsection{mytabular環境}^^A [[[
+% \begin{vimcode}
+snippet mytabular
+\begin{mytabular}{$1}
+$0
+\end{mytabular}
+endsnippet
+% \end{vimcode}
+% ^^A ]]] End of subsection `mytabular環境'.
+%
+% \begin{vimcode}
+snippet figure
+\begin{figure}[ht]% [[[
+\centering
+${0}
+\caption{${1}}
+\figlabel{${2}}
+\end{figure}% ]]]
+endsnippet
+
+snippet subfigure
+\begin{subfigure}{0.${1}\columnwidth}% [[[
+\centering
+${0}
+\caption{${2}}
+\figlabel{${3}}
+\end{subfigure}% ]]]
+endsnippet
+
+snippet table
+\begin{table}[ht]% [[[
+\centering
+${0}
+\caption{${1}}
+\label{tab:${2}}
+\end{table}% ]]]
+endsnippet
+
+snippet frame
+\begin{frame}{${1:#:frametitle}}% [[[
+${0}
+\end{frame}% ]]] End of frame `$1'.
+endsnippet
+
+snippet beamer-block
+\begin{block}{${1:#:blocktitle}}% [[[
+${0}
+\end{block}% ]]] End of block `$1'.
+endsnippet
+
+
+
+
+
+% \end{vimcode}
+% ^^A ]]] End of subsubsection `etc.'.
+%
+% ^^A ]]] End of section `Basic structures'.
+%
+% \section{Math}^^A [[[
+%
+% \subsection{axiom, definition, lemma, proposition, theorem}^^A [[[
+% \begin{vimcode}
+snippet axiom
+\begin{axiom}[label=$1]% [[[
+$0
+
+\begin{concealableitemize}% [[[
+\1 axiom
+  \2 
+\end{concealableitemize}% ]]]
+
+\end{axiom}% ]]]
+endsnippet
+
+snippet definition
+\begin{definition}[label=$1]% [[[
+$0
+
+\begin{concealableitemize}% [[[
+\1 definition
+  \2 
+\end{concealableitemize}% ]]]
+
+\end{definition}% ]]]
+endsnippet
+
+snippet example
+\begin{example}% [[[
+$0
+
+\begin{concealableitemize}% [[[
+\1 example
+  \2 
+\end{concealableitemize}% ]]]
+
+\end{example}% ]]]
+endsnippet
+
+snippet lemma
+\begin{lemma}[label=$1]% [[[
+$0
+
+\begin{concealableitemize}% [[[
+\1 lemma
+  \2 
+\end{concealableitemize}% ]]]
+
+\end{lemma}% ]]]
+endsnippet
+
+snippet proposition
+\begin{proposition}[label=$1]% [[[
+$0
+
+\begin{concealableitemize}% [[[
+\1 proposition
+  \2 
+\end{concealableitemize}% ]]]
+
+\end{proposition}% ]]]
+endsnippet
+
+snippet theorem
+\begin{theorem}[label=$1]% [[[
+$0
+
+\begin{concealableitemize}% [[[
+\1 theorem
+  \2 
+\end{concealableitemize}% ]]]
+
+\end{theorem}% ]]]
+endsnippet
+
+% \end{vimcode}
+% ^^A ]]] End of subsection `axiom, definition, lemma, proposition, theorem'.
+%
+% \subsubsection{myproof環境}^^A [[[
+% \begin{vimcode}
+snippet proof
+\\begin{myproof}[column=2]% [[[
+${0}
+\\end{myproof}% ]]]
+endsnippet
+% \end{vimcode}
+% ^^A ]]] End of subsubsection `myproof環境'.
+%
+% \subsubsection{mycalculation}^^A [[[
+% \begin{vimcode}
+snippet calculation
+\\begin{mycalculation}
+$0
+\\end{mycalculation}
+endsnippet
+% \end{vimcode}
+% ^^A ]]] End of subsubsection `mycalculation'.
+%
+% \subsubsection{\texcommand{mybecause}}^^A [[[
+% \begin{vimcode}
+snippet mybecause
+\\mybecause{\\eqref{$1}}$0
+endsnippet
+% \end{vimcode}
+% ^^A ]]] End of subsubsection `\mybecause'.
+%
+% \subsubsection{equation}^^A [[[
+%
+%
+% \begin{vimcode}
+snippet equation
+\\begin{equation}
+  \\eqlabel{$1}
+  $0
+\\end{equation}
+endsnippet
+
+snippet align
+\\begin{align}
+  \\eqlabel{$1}
+  $0
+\\end{align}
+endsnippet
+
+snippet eqref
+\\eqref{$1}$0
+endsnippet
+
+snippet aligned
+\\begin{aligned}
+  \\eqlabel{$1}
+  $0
+\\end{aligned}
+endsnippet
+
+% \end{vimcode}
+% ^^A ]]] End of subsubsection `equation'.
+%
+%
+%
+%
+%
+%
+% ^^A ]]] End of section `Math'.
+%
+% \subsection{myitemize環境}^^A [[[
+% \begin{vimcode}
+%<<SNIPPETS
+
+snippet itemize "\begin{myitemize} ..." b
+\\begin{myitemize}
+\\1 $1
+\\1 $0
+\\end{myitemize}
+endsnippet
+
+snippet itemize-dtx "myitemize-dtx" b
+% \\begin{myitemize}
+% \\1 $1
+% \\1 $0
+% \\end{myitemize}
+endsnippet
+
+%SNIPPETS
+% \end{vimcode}
+% ^^A ]]] End of subsection `myitemize環境'.
+%
+% \subsubsection{mynote, mytip, mywarning}^^A [[[
+%
+% \begin{vimcode}
+%<<SNIPPETS
+snippet note "\begin{mynote} ..." b
+\\begin{mynote}$1% [[[
+$0
+\\end{mynote}% ]]]
+endsnippet
+
+snippet note-dtx "% \begin{mynote} ..." b
+% \\begin{mynote}$1^^A [[[
+% $0
+% \\end{mynote}^^A ]]]
+endsnippet
+
+snippet tip "\begin{mytip} ..." b
+\\begin{mytip}$1% [[[
+$0
+\\end{mytip}% ]]]
+endsnippet
+
+snippet tip-dtx "% \begin{mytip} ..." b
+% \\begin{mytip}$1^^A [[[
+% $0
+% \\end{mytip}^^A ]]]
+endsnippet
+
+snippet warning "\begin{mywarning} ..." b
+\\begin{mywarning}$1% [[[
+$0
+\\end{mywarning}% ]]]
+endsnippet
+
+snippet warning-dtx "% \begin{mywarning} ..." b
+% \\begin{mywarning}$1^^A [[[
+% $0
+% \\end{mywarning}^^A ]]]
+endsnippet
+
+%SNIPPETS
+% \end{vimcode}
+% ^^A ]]] End of subsubsection `mynote, mytip, mywarning'.
+%
+% \subsection{Part, Sections, Paragraph}^^A [[[
+%
+% \begin{vimcode}
+%<<SNIPPETS
+
+snippet section "\section" b
+\section{$1}% [[[
+$0
+% ]]] End of section \`$1'.
+endsnippet
+
+snippet section-dtx "\section" b
+% \section{$1}^^A [[[
+% $0
+% ^^A ]]] End of section \`$1'.
+endsnippet
+
+snippet subsection "\subsection" b
+\subsection{$1}% [[[
+$0
+% ]]] End of subsection \`$1'.
+endsnippet
+
+snippet subsection-dtx "\subsection" b
+% \subsection{$1}^^A [[[
+% $0
+% ^^A ]]] End of subsection \`$1'.
+endsnippet
+
+snippet subsubsection "\subsubsection" b
+\subsubsection{$1}% [[[
+$0
+% ]]] End of subsubsection \`$1'.
+endsnippet
+
+snippet subsubsection-dtx "\subsubsection" b
+% \subsubsection{$1}^^A [[[
+% $0
+% ^^A ]]] End of subsubsection \`$1'.
+endsnippet
+
+%SNIPPETS
+% \end{vimcode}
+% ^^A ]]] End of subsection `Sections'.
+%
+% \subsection{\texcommand{href}, \texcommand{urlref}}^^A [[[
+% \begin{vimcode}
+snippet href "\href{URL}{...}"
+\\href{$1}{$2}$0
+endsnippet
+
+snippet urlref
+\\urlref{$1}{$2}$0
+endsnippet
+% \end{vimcode}
+% ^^A ]]] End of subsection `\href, \urlref'.
+%
+% \subsection{\texcommand{mycite}, \texcommand{texdoc}}^^A [[[
+% \begin{vimcode}
+snippet mycite "\mycite{...}"
+\\mycite[${1:keyword}=$2]{$3}$0
+endsnippet
+
+snippet texdoc
+\\texdoc[$1=$2]{$3}$0
+endsnippet
+% \end{vimcode}
+% ^^A ]]] End of subsection `\mycite, \texdoc'.
+%
+% \subsection{\texcommand{myterm}}^^A [[[
+% \begin{vimcode}
+snippet term "\myterm{...}"
+\\myterm[${1:english}=$2]{$3}$0
+endsnippet
+% \end{vimcode}
+% ^^A ]]] End of subsection `\myterm'.
+%
+% \subsection{concealable***}^^A [[[
+% \begin{vimcode}
+%<<SNIPPETS
+snippet concealablenote
+\\begin{concealablenote}% [[[
+$0
+\\end{concealablenote}% ]]]
+endsnippet
+
+snippet concealablenote-dtx
+% \\begin{concealablenote}^^A [[[
+% $0
+% \\end{concealablenote}^^A ]]]
+endsnippet
+
+snippet concealableitemize
+\\begin{concealableitemize}% [[[
+\\1 $1
+\\1 $0
+\\end{concealableitemize}% ]]]
+endsnippet
+
+snippet concealableitemize-dtx
+% \\begin{concealableitemize}^^A [[[
+% \\1 $1
+% \\1 $0
+% \\end{concealableitemize}^^A ]]]
+endsnippet
+
+%SNIPPETS
+% \end{vimcode}
+% ^^A ]]] End of subsection `concealable***'.
+%
+%
+%
+% \begin{vimcode}
+%<<SNIPPETS
+
+snippet shelltest "shell test"
+test: `pwd`.
+endsnippet
+
+
+snippet wow
+${1:Text}`!p snip.rv = (75-2*len(t[1]))*' '+t[1].upper()`
+endsnippet
+
+
+
+
+
+
+%SNIPPETS
+% \end{vimcode}
+%
+% \iffalse
+%</tex.snippets>
+% \fi
+%
+% ^^A ]]] End of part `tex.snippets'.
+%
+% \part{\texttt{yaml.snippets}}^^A [[[
+%
+% \iffalse
+%<*yaml.snippets>
+% \fi
+%
+% \section{To-do list}^^A [[[
+% \begin{yamlcode}
+snippet task "to-do-list task" b
+- task: ${1}
+  deadline: ${2:YYYY-MM-DDTHH:MM:SS}
+  status: ${3:not started}
+  misc:
+  - ${4}
+  updated: 
+${0}
+endsnippet
+% \end{yamlcode}
+% ^^A ]]] End of section `To-do list'.
+%
+% \section{English}^^A [[[
+% \begin{yamlcode}
+snippet english "english" b
+- english: ${1}
+  japanese:
+  - ${2}
+  references:
+  - url: ${3}
+    title: ${4}
+    updated: ${5}
+  notes:
+  - 
+  updated: ${0}
+endsnippet
+% \end{yamlcode}
+% ^^A ]]] End of section `English'.
+%
+% \section{BGM}^^A [[[
+% \begin{myitemize}
+% \1 \yamlinline{weekday}
+%   \2 If true, display weekday in the clock, in addition to time.
+%   \bashinline{gsettings describe org.gnome.desktop.interface clock-show-weekday}
+% \1 \yamlinline{time}, \yamlinline{start}, \yamlinline{end}
+%   \2 \href{https://eikaiwa.dmm.com/uknow/questions/68436/}{開始時間って英語でなんて言うの？}
+%   \2 \href{https://eikaiwa.dmm.com/uknow/questions/70888/}{終了時間って英語でなんて言うの？}
+%   \2 \mycite[keyword=開始時間]{weblio}
+% \1 \yamlinline{history}
+%   \2 youtube
+% \1 
+% \end{myitemize}
+%
+% \begin{yamlcode}
+snippet bgm
+radio:
+- title: foo
+  official website: https://...
+  weekday: Sunday
+  time:
+    start: 17:00
+    end: 17:55
+  youtube: https://www.youtube.com/results?search_query=foo
+  history:
+  - date: 2022-01-02
+    status: completed
+  - date: 2022-01-09
+    status: in progress
+    notes: ...
+  - date: 2022-01-23
+    status: not started
+endsnippet
+% \end{yamlcode}
+% ^^A ]]] End of section `BGM'.
+%
+% \section{Data}^^A [[[
+% \begin{myitemize}
+% \1 \yamlinline{count(s)}
+%   \2 \man[keyword={-l, -m, -w, ...}]{wc}
+% \end{myitemize}
+%
+% \subsection{Videos}[updated=2022-02-17T21:08:34]^^A [[[
+% \begin{myitemize}
+% \1 \yamlinline{***}
+% \end{myitemize}
+%
+% \begin{yamlcode}
+snippet videos
+provided videos:
+- date: 
+  notes:
+  - 
+  miscellaneous:
+    foo: 
+  videos:
+  - filename: 
+    original data:
+      location: 
+      modification time: 
+      file size: 
+      duration: 
+      backup:
+        dgx: 
+        onedrive: 
+    annotation files:
+      use: 
+      number of images: 
+      number of classes:
+        0: 
+        1: 
+        2: 
+      backup:
+        dgx: 
+        onedrive: 
+      notes:
+      - 
+    notes:
+    - 
+    miscellaneous:
+      video for inference:
+      - start: 
+        end: 
+        playback speed: 
+        backup:
+          dgx: 
+          onedrive: 
+        notes:
+        - 
+    updated: 
+endsnippet
+% \end{yamlcode}
+% ^^A ]]] End of subsection `Videos'.
+%
+% \subsection{Models and evaluation}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \yamlinline{***}
+% \end{myitemize}
+%
+% \begin{yamlcode}
+snippet models-and-evaluation
+- model number: 
+  purpose: 
+  yolo cfg:
+    version: v4
+    net:
+      angle: 
+      blur: 
+      cutmix: 
+      exposure: 
+      flip: 
+      gaussian_noise: 
+      hue: 
+      mosaic: 
+      mixup: 
+      saturation: 
+  train:
+    number of images: 
+    number of classes:
+      0: 
+      1: 
+      2: 
+  evaluate:
+  - number of images: 
+    number of classes:
+      0: 
+      1: 
+      2: 
+    confidence threshold: 
+    iou threshold: 
+    ap:
+      0: 
+      1: 
+      2: 
+    precision: 
+    recall: 
+    f1-score: 
+    map: 
+endsnippet
+% \end{yamlcode}
+% ^^A ]]] End of subsection `Models and evaluation'.
+%
+% ^^A ]]] End of section `Data'.
+%
+% \iffalse
+%</yaml.snippets>
+% \fi
+%
+% ^^A ]]] End of part `yaml.snippets'.
+%
+% ^^A End of file `snippets.dtx'.
