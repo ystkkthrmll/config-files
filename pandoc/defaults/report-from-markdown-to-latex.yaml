@@ -13,7 +13,7 @@ variables:
   documentclass: mydocument
   classoption:
   - english
-  # - math
+  - math
   - programming
   colorlinks: true
   linkcolor: teal

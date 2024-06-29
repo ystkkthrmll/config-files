@@ -12,7 +12,10 @@ config-files
 │   ├── refs
 │   │   ├── misc.yaml
 └── visual-stadio-code
-    └── visual-stadio-code.dtx
+    ├── visual-stadio-code.dtx
+    └── output-files
+        ├── keybindings.json
+        └── settings.json
 ```
 
 
