@@ -132,7 +132,7 @@ tqdm
 %
 % \endinput
 %
-% \part{config}[updated=]^^A [[[
+% \part{SSH config}[updated=]^^A [[[
 % \begin{myitemize}
 % \1 \href{https://www.ssh.com/academy/ssh/config}{SSH config file for OpenSSH client}
 % \1 Host
@@ -156,12 +156,6 @@ tqdm
 %
 % \subsection{github.com}[updated=]^^A [[[
 % \begin{bashcode}
-Host github.com
-    HostName github.com
-    User git
-    IdentitiesOnly yes
-    IdentityFile ~/.ssh/github-kitahara-neut
-    Compression yes
 
 % \end{bashcode}
 % ^^A ]]] End of subsection `github.com'.
@@ -191,9 +185,31 @@ Host github.com
 % \iffalse
 %</config.home>
 % \fi
-% ^^A ]]] End of section `common'.
+% ^^A ]]] End of section `home'.
 %
-% ^^A ]]] End of part `config'.
+% \section{office}[updated=]^^A [[[
+% \iffalse
+%<*config.office>
+% \fi
+%
+% \subsection{github.com}[updated=]^^A [[[
+% \begin{bashcode}
+Host github.com
+    HostName github.com
+    User git
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/github-kitahara-neut
+    Compression yes
+
+% \end{bashcode}
+% ^^A ]]] End of subsection `github.com'.
+%
+% \iffalse
+%</config.office>
+% \fi
+% ^^A ]]] End of section `office'.
+%
+% ^^A ]]] End of part `SSH config'.
 %
 % \part{\texttt{utilities.js}}^^A [[[
 % \iffalse
