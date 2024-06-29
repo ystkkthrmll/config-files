@@ -3,7 +3,7 @@
 % \iffalse
 %<*driver>
 \input mydocstrip
-\mygenerate[output-files/configuration-files]{
+\mygenerate[output-files/config-files]{
   init.vim,
   .NERDTreeBookmarks.home,
   .NERDTreeBookmarks.office,
@@ -300,7 +300,7 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
 
-let g:UltiSnipsSnippetDirectories = [$HOME.'/Dropbox/configuration-files/vim/output-files/snippets']
+let g:UltiSnipsSnippetDirectories = [$HOME.'/Dropbox/config-files/vim/output-files/snippets']
 
 % \end{vimcode}
 % ^^A ]]] End of subsection `Snippets'.
@@ -652,7 +652,7 @@ autocmd VimEnter *.* :normal 10za
 %<*.NERDTreeBookmarks.home|.NERDTreeBookmarks.office>
 % \fi
 %    \begin{macrocode}
-configuration-files ~/Dropbox/configuration-files
+config-files ~/Dropbox/config-files
 $HOME ~
 projects ~/projects
 %    \end{macrocode}
