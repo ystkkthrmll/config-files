@@ -1,0 +1,1918 @@
+%
+% ^^A Configuring DocStrip [[[
+% \iffalse
+%<*driver>
+\input mydocstrip
+\mygenerate[output-files/python]{
+  analogclock.py,
+  bgm.py,
+  mymodule.py,
+  references.py,
+  template.html.jinja,
+  todolist.py,
+}
+\myrenamefile[output-files/python]{analogclock.py}{analog_clock.py}
+\myrenamefile[output-files/python]{mymodule.py}{my_module.py}
+\myrenamefile[output-files/python]{todolist.py}{to_do_list.py}
+\myendbatchfile
+\mydriver[
+  show-notes,
+]
+%</driver>
+% \fi
+% ^^A ]]] End of Configuring DocStrip
+%
+% \mytitle{Python apps}
+%
+% \begin{abstract}^^A [[[
+% \begin{myitemize}
+% \1 Python website: \url{https://www.python.org/}
+% \1 \verb|analog_clock.py|
+% \1 \verb|to_do_list.py|
+% \1 
+% \end{myitemize}
+% \end{abstract}^^A ]]]
+%
+% \begin{mywarning}^^A [[[
+% \begin{myitemize}
+% \1 Pythonのfilenameに使用する区切り文字：\verb|_|
+%   \2 \verb|/usr/lib/python3/dist-packages/|にあるファイルを参照せよ
+%   \2 \pythoninline{import foo-bar}がエラーになる
+% \1 filenameの\verb|_|は省略する
+%   \2 \verb|/usr/lib/python3/dist-packages/|にあるファイルを参照せよ
+%     \3 例：\verb|/usr/lib/python3/dist-packages/entrypoints.py|, \verb|/usr/lib/python3.8/gettext.py|
+% \end{myitemize}
+% \end{mywarning}^^A ]]]
+%
+% \mytableofcontents
+%
+% \part{\texttt{my\_module.py}}^^A [[[
+% \begin{myitemize}
+% \1 The origin of `module'
+%   \2 \href{https://docs.python.org/3/tutorial/modules.html}{6. Modules — Python 3.11.1 documentation}
+% \end{myitemize}
+%
+% \iffalse
+%<*mymodule.py>
+% \fi
+%
+% \section{Importing modules}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{argparse}
+%   \2 
+% \1 \pythoninline{openpyxl}
+%   \2 to 
+% \1 \pythoninline{os}
+%   \2 to make output directory
+% \1 \pythoninline{subprocess}
+%   \2 to preview output file
+% \end{myitemize}
+%
+% \begin{pythoncode}
+import argparse
+from datetime import datetime
+from graphviz import Digraph
+from jinja2 import Environment, FileSystemLoader
+import openpyxl
+import os
+import pandas as pd
+import subprocess
+import sys
+import yaml
+
+% \end{pythoncode}
+% ^^A ]]] End of section `Importing modules'.
+%
+% \section{Defining classes}[updated=]^^A [[[
+%
+% \subsection{\texttt{FileConverter} class}[updated=]^^A [[[
+% \begin{pythoncode}
+class FileConverter:
+    """
+
+    Attributes:
+      file_path_input:
+        File path to convert (JSON, YAML, etc.).
+      file_path_output:
+        File path to write.
+      orig_data:
+        Dictionary data decoded from file specified by file_path_input.
+    """
+% \end{pythoncode}
+%
+% \subsubsection{Constructor}[updated=2023-08-26T04:34:02]^^A [[[
+% \begin{pythoncode}
+    def __init__(
+        self,
+        file_path_input: str,
+        file_path_output: str,
+    ) -> None:
+        self.file_path_input = file_path_input
+        self.file_path_output = file_path_output
+        self.orig_data = self._decode_input_file()
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `Constructor'.
+%
+% \subsubsection{\texttt{\_decode\_input\_file()} method}[updated=2023-08-26T04:37:00]^^A [[[
+% \begin{pythoncode}
+    def _decode_input_file(self) -> dict:
+        file_ext = os.path.splitext(self.file_path_input)[1]
+        with open(self.file_path_input, 'r') as f:
+            if file_ext == '.yaml' or file_ext == '.yml':
+                orig_data = yaml.safe_load(f)
+            else:
+                print('Error')
+        return orig_data
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `_decode_input_file()'.
+%
+% \subsubsection{\texttt{\_itemize\_list\_data()} method}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{str(item)}
+%   \2 \pythoninline{item}に\pythoninline{dict}が含まれる可能性があるため
+% \end{myitemize}
+%
+% \begin{pythoncode}
+    @staticmethod
+    def _itemize_list_data(
+        list_data: list,
+        str_join: str = '\n',
+        str_item: str = '・',
+    ) -> str:
+        if not isinstance(list_data, list):
+            return list_data
+        elif list_data[0] == None:
+            return ''
+        else:
+            return str_join.join([str_item + str(item) for item in list_data])
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `_itemize_list_data()'.
+%
+% \subsubsection{\texttt{modify\_excel\_format()} method}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 The origin of `adjust'
+%   \2 \href{https://stackoverflow.com/questions/13197574/openpyxl-adjust-column-width-size}{openpyxl - adjust column width size}
+% \end{myitemize}
+%
+% \begin{pythoncode}
+    @staticmethod
+    def modify_excel_format(
+        file_path: str,
+        adjust_col_width: bool = True,
+        alignment_vertical: str = 'top',
+        font: str = 'メイリオ',
+    ) -> None:
+        """
+        Args:
+          file_path:
+            File path to modify format.
+        """
+        wb = openpyxl.load_workbook(filename=file_path)
+        for ws in wb.worksheets:
+            for col in ws.columns:
+                for cell in col:
+                    # font
+                    ws[cell.coordinate].font = openpyxl.styles.Font(name=font)
+                    # alignment
+                    ws[cell.coordinate].alignment = openpyxl.styles.Alignment(vertical=alignment_vertical)
+                if adjust_col_width:
+                    max_length = 0
+                    column = col[0].column_letter
+                    for cell in col:
+                        try:
+                            if len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                            pass
+                    adjusted_width = (max_length + 2) * 1.2
+                    # adjust col width
+                    if adjust_col_width:
+                        ws.column_dimensions[column].width = adjusted_width
+        wb.save(file_path)
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `modify_excel_format()'.
+%
+% \subsubsection{\texttt{parse\_args()} method}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 The origin of `\verb|--preview|'
+%   \2 \bashinline{latexmk -help}
+% \end{myitemize}
+%
+% \begin{pythoncode}
+    @staticmethod
+    def parse_args(add_file_path_output: bool = False):
+        parser = argparse.ArgumentParser(
+            description='Example: $ python converter.py foo.yaml')
+        parser.add_argument(
+            'file_path_input', help='File path to convert (JSON, YAML, etc.)')
+        if add_file_path_output:
+            parser.add_argument('file_path_output', help='Output file path')
+        parser.add_argument(
+            '-p', '--preview', action='store_true', help='Preview document')
+        args = parser.parse_args()
+        return args
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `parse_args()'.
+%
+% \subsubsection{\texttt{make\_dir()} method}[updated=2023-08-28T16:13:06]^^A [[[
+% \begin{pythoncode}
+    @staticmethod
+    def make_dir(dir_path: str) -> None:
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `make_dir()'.
+%
+% \subsubsection{\texttt{preview\_output\_file()} method}[updated=]^^A [[[
+% \begin{pythoncode}
+    def preview_output_file(self) -> None:
+        subprocess.run(f'open {self.file_path_output}', shell=True)
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `preview_output_file()'.
+%
+% ^^A ]]] End of subsection `FileConverter class'.
+%
+% \subsection{\texttt{HtmlCreator} class}[updated=]^^A [[[
+% \begin{pythoncode}
+class HtmlCreator:
+% \end{pythoncode}
+%
+% \subsubsection{Constructor}[updated=]^^A [[[
+% \begin{pythoncode}
+    def __init__(self, title='', headings=[], main_body=''):
+        self.title = title
+        self.headings = headings
+        self.main_body = main_body
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `Constructor'.
+%
+% \subsubsection{\texttt{add\_table()}}[updated=]^^A [[[
+% \begin{pythoncode}
+    def add_table(self, heading, df: pd.DataFrame):
+        self.headings.append(heading)
+        self.main_body += f'<h1 id="{heading}">{heading}</h1>\n'
+        self.main_body += df.to_html(escape=False, render_links=True)
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `add_table()'.
+%
+% \subsubsection{\texttt{create\_html\_file()}}[updated=]^^A [[[
+% \begin{pythoncode}
+    def create_html_file(self, filename: str):
+        params = {
+            'headings': self.headings,
+            'main_body': self.main_body,
+            'title': self.title,
+            'updated': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+        }
+        env = Environment(
+            loader=FileSystemLoader(
+                '/home/yasutaka/Dropbox/configuration-files/miscellaneous/output-files/python',
+                encoding='utf8'))
+        template = env.get_template('template.html.jinja')
+        with open(filename, 'w') as f:
+            f.write(template.render(params))
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `create_html_file()'.
+%
+% ^^A ]]] End of subsection `HtmlCreator class'.
+%
+% \subsection{\texttt{Flowchart} class}[updated=]^^A [[[
+% \begin{pythoncode}
+class Flowchart(Digraph):
+% \end{pythoncode}
+%
+% \subsubsection{Constructor}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{format}
+%   \2 \href{https://graphviz.readthedocs.io/en/stable/manual.html#formats}{Formats}
+% \end{myitemize}
+%
+% \begin{pythoncode}
+    # def __init__(self, format_: str = 'pdf'):
+        # super().__init__(self, format=format_)
+        # self.format = format_
+        # super().attr('node', fontname='IPAexGothic', fontsize='14')
+        # self.attr('node', fontname='IPAexGothic', fontsize='14')
+        # self.attr('edge', fontname='IPAexGothic', fontsize='14')
+        # pass
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `Constructor'.
+%
+% \subsubsection{\texttt{initialize()}}[updated=]^^A [[[
+% \begin{pythoncode}
+    def initialize(self) -> None:
+        self.attr('node', fontname='IPAexGothic', fontsize='14')
+        self.attr('edge', fontname='IPAexGothic', fontsize='14', style='bold')
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `initialize()'.
+%
+% \subsubsection{\texttt{terminal()}}[updated=]^^A [[[
+% \begin{pythoncode}
+    def terminal(self, name: str, label: str = None) -> None:
+        self.node(
+            name, label=label, color='black', colorscheme='pastel28', fillcolor='2',
+            shape='box', style='rounded,filled')
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `terminal()'.
+%
+% \subsubsection{\texttt{process()}}[updated=]^^A [[[
+% \begin{pythoncode}
+    def process(self, name: str, label: str = None) -> None:
+        self.node(
+            name, label=label, color='black', colorscheme='pastel28', fillcolor='3',
+            shape='box', style='filled')
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `process()'.
+%
+% \subsubsection{\texttt{decision()}}[updated=]^^A [[[
+% \begin{pythoncode}
+    def decision(self, name: str, label: str = None) -> None:
+        self.node(
+            name, label=label, color='black', colorscheme='pastel28', fillcolor='1',
+            shape='diamond', style='filled')
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `decision()'.
+%
+% \subsubsection{\texttt{main\_edge()}}[updated=]^^A [[[
+% \begin{pythoncode}
+    def main_edge(self, edges: list) -> None:
+        for tail_name, head_name in zip(edges[:-1], edges[1:]):
+            self.edge(tail_name, head_name)
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `main_edge()'.
+%
+% \subsubsection{\texttt{annot()}}[updated=]^^A [[[
+% \begin{pythoncode}
+    def annot(self, node_name: str, annot=None) -> None:
+        if isinstance(annot, list):
+            annot = self.convert_list_to_str(annot)
+        head_name = 'annot_' + node_name
+        tail_name = node_name
+        self.node(
+            head_name, label=annot, color='black', colorscheme='pastel28',
+            fillcolor='6', fontsize='8', shape='note', style='filled')
+        self.edge(
+            tail_name, head_name, arrowhead='none', constraint='false',
+            penwidth='1.0', style='dotted')
+        self.body.append(f'{{ rank=same; {tail_name}; {head_name}; }}\n')
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `annot()'.
+%
+% \subsubsection{\texttt{convert\_list\_to\_str()}}[updated=]^^A [[[
+% \begin{pythoncode}
+    @staticmethod
+    def convert_list_to_str(list_: list) -> str:
+        return '\l'.join(list_) + '\l'
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `convert_list_to_str()'.
+%
+% ^^A ]]] End of subsection `Flowchart class'.
+%
+% ^^A ]]] End of section `Defining classes'.
+%
+% \iffalse
+%</mymodule.py>
+% \fi
+% ^^A ]]] End of part `my_module.py'.
+%
+% \endinput
+%
+% \iffalse
+%
+% \part{\texttt{analog\_clock.py}}^^A [[[
+%
+% \section{Notes}^^A [[[
+% \begin{myitemize}
+% \1 The origin of `analog clock'
+%   \2 \href{https://www.geeksforgeeks.org/create-analog-clock-using-pyqt5-in-python/}{Create Analog Clock using PyQt5 in Python}
+%   \2 \href{https://thecleverprogrammer.com/2020/05/19/analog-clock-with-python/}{Analog Clock with Python}
+% \1 documentations
+%   \2 \href{https://wiki.python.org/moin/PyQt/Tutorials}{Getting Started with PyQt}
+% \1 references
+%   \2 PyQt5
+%     \3 \href{https://www.geeksforgeeks.org/create-analog-clock-using-pyqt5-in-python/}{Create Analog Clock using PyQt5 in Python}
+%     \3 \href{https://www.pythonguis.com/tutorials/qml-animations-transformations/}{Animations and Transformations with QtQuick}
+%       \4 \verb|sudo apt-get install python3-pyqt5.qtquick| \href{https://stackoverflow.com/questions/36175717/importerror-no-module-named-pyqt5-qtquick}{ImportError: No module named 'PyQt5.QtQuick'}
+%   \2 Tkinter
+%     \3 \href{https://thecleverprogrammer.com/2020/05/19/analog-clock-with-python/}{Analog Clock with Python}
+% \end{myitemize}
+% ^^A ]]] End of section `Notes'.
+%
+% \section{Implemantation}^^A [[[
+%
+% \iffalse
+%<*analogclock.py>
+% \fi
+%
+% \subsection{Importing modules}[updated=]^^A [[[
+%
+%
+% \begin{pythoncode}
+from PyQt5.QtWidgets import *
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+import sys
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Importing modules'.
+%
+% \subsection{Clock class}[updated=]^^A [[[
+%
+%
+%
+% \begin{pythoncode}
+class Clock(QMainWindow):
+% \end{pythoncode}
+%
+% \subsubsection{Constructor}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{setWindowTitle()}
+%   \2 \href{https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QWidget.html?highlight=setwindowtitle#PySide2.QtWidgets.PySide2.QtWidgets.QWidget.setWindowTitle}{setWindowTitle()}
+% \1 \pythoninline{setGeometry(x, y, width, height)}
+%   \2 \href{https://www.geeksforgeeks.org/setgeometry-method-pyqt5/}{setGeometry method – Pyqt5}
+% \1 \pythoninline{setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)}
+%   \2 \href{https://stackoverflow.com/questions/1925015/pyqt-always-on-top}{PyQt: Always on top}
+% \1 \pythoninline{setWindowIcon(QtGui.QIcon('analog-clock.png'))}
+%   \2 \href{https://www.geeksforgeeks.org/how-to-set-icon-to-a-window-in-pyqt5/}{How to set icon to a window in PyQt5 ?}
+% \1 
+% \1
+% \end{myitemize}
+%
+% \begin{pythoncode}
+    def __init__(self):
+        super().__init__()
+  
+        # creating a timer object
+        timer = QTimer(self)
+  
+        # adding action to the timer
+        # update the whole code
+        timer.timeout.connect(self.update)
+  
+        # setting start time of timer i.e 1 second
+        timer.start(1000)
+  
+        self.setWindowTitle('Clock')
+        self.setGeometry(10000, 10000, 200, 200)
+  
+        # setting background color to the window
+        self.setStyleSheet("background : black;")
+  
+        # creating hour hand
+        self.hPointer = QtGui.QPolygon([QPoint(6, 7),
+                                        QPoint(-6, 7),
+                                        QPoint(0, -50)])
+  
+        # creating minute hand
+        self.mPointer = QPolygon([QPoint(6, 7),
+                                  QPoint(-6, 7),
+                                  QPoint(0, -70)])
+  
+        # creating second hand
+        self.sPointer = QPolygon([QPoint(1, 1),
+                                  QPoint(-1, 1),
+                                  QPoint(0, -90)])
+        # colors
+        # color for minute and hour hand
+        self.bColor = Qt.green
+  
+        # color for second hand
+        self.sColor = Qt.red
+
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowIcon(QtGui.QIcon('/home/yasutaka/Dropbox/configuration-files/etc/output-files/python/analog-clock.png'))
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `Constructor'.
+%
+% \subsubsection{***}[updated=]^^A [[[
+%
+%
+%
+% \begin{pythoncode}
+    # method for paint event
+    def paintEvent(self, event):
+  
+        # getting minimum of width and height
+        # so that clock remain square
+        rec = min(self.width(), self.height())
+  
+        # getting current time
+        tik = QTime.currentTime()
+  
+        # creating a painter object
+        painter = QPainter(self)
+  
+        # method to draw the hands
+        # argument : color rotation and which hand should be pointed
+        def drawPointer(color, rotation, pointer):
+  
+            # setting brush
+            painter.setBrush(QBrush(color))
+  
+            # saving painter
+            painter.save()
+  
+            # rotating painter
+            painter.rotate(rotation)
+  
+            # draw the polygon i.e hand
+            painter.drawConvexPolygon(pointer)
+  
+            # restore the painter
+            painter.restore()
+  
+        # tune up painter
+        painter.setRenderHint(QPainter.Antialiasing)
+  
+        # translating the painter
+        painter.translate(self.width() / 2, self.height() / 2)
+  
+        # scale the painter
+        painter.scale(rec / 200, rec / 200)
+  
+        # set current pen as no pen
+        painter.setPen(QtCore.Qt.NoPen)
+  
+        # draw each hand
+        drawPointer(self.bColor, (30 * (tik.hour() + tik.minute() / 60)), self.hPointer)
+        drawPointer(self.bColor, (6 * (tik.minute() + tik.second() / 60)), self.mPointer)
+        drawPointer(self.sColor, (6 * tik.second()), self.sPointer)
+  
+        # drawing background
+        painter.setPen(QPen(self.bColor))
+  
+        # for loop
+        for i in range(0, 60):
+  
+            # drawing background lines
+            if (i % 5) == 0:
+                painter.drawLine(87, 0, 97, 0)
+  
+            # rotating the painter
+            painter.rotate(6)
+  
+        # ending the painter
+        painter.end()
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `***'.
+%
+% ^^A ]]] End of subsection `***'.
+%
+% \subsection{main function}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 The origin of `main function'
+%   \2 \href{https://doc.qt.io/qtforpython/quickstart.html#create-a-simple-application}{Qt for Python Quick start}
+% \1 Basic structure
+%   \2 \href{https://doc.qt.io/qtforpython-5/tutorials/basictutorial/widgets.html}{Your First QtWidgets Application}
+%   \2 \href{https://doc.qt.io/qtforpython/quickstart.html#create-a-simple-application}{Qt for Python Quick start}
+%   \2 \href{https://google.github.io/styleguide/pyguide.html#317-main}{Main}
+% \1 \pythoninline{QApplication()}
+%   \2 Next, we create a QApplication with the command:
+%   \python{app = QApplication([])}
+%   This is a requirement of Qt: Every GUI app must have exactly one instance of QApplication.
+%   Many parts of Qt don't work until you have executed the above line.
+%   You will therefore need it in virtually every (Py)Qt app you write.
+%   \urlref{https://build-system.fman.io/pyqt5-tutorial}{Create a GUI}
+% \end{myitemize}
+%
+% \begin{pythoncode}
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = Clock()
+    win.show()
+    sys.exit(app.exec())
+% \end{pythoncode}
+% ^^A ]]] End of subsection `main function'.
+%
+% \iffalse
+%</analogclock.py>
+% \fi
+%
+% ^^A ]]] End of section `Implemantation'.
+%
+% ^^A ]]] End of part `analog_clock.py'.
+%
+% \fi
+%
+% \part{\texttt{bgm.py}}^^A [[[
+%
+% \section{Notes}^^A [[[
+% \begin{myitemize}
+% \1 
+% \1 
+% \end{myitemize}
+% ^^A ]]] End of section `Notes'.
+%
+% \section{Implemantation}^^A [[[
+% \iffalse
+%<*bgm.py>
+% \fi
+%
+% \subsection{Importing modules}[updated=]^^A [[[
+% \begin{pythoncode}
+from  yaml import safe_load
+import pandas as pd
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Importing modules'.
+%
+% \subsection{Defining \texttt{main} function}[updated=]^^A [[[
+% \begin{pythoncode}
+def main():
+    input_file = '/home/yasutaka/my-documents/miscellaneous/miscellaneous/bgm.yaml'
+    with open(input_file, 'r') as f:
+        data = safe_load(f)
+        for datum in data['radio']:
+            print('=' * 30, datum['title'], '=' * 30)
+            #  print(datum['history'])
+            df = pd.DataFrame(datum['history'])
+            print(df)
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Defining main function'.
+%
+% \subsection{Excuting main function}[updated=]^^A [[[
+% \begin{pythoncode}
+if __name__ == '__main__':
+    main()
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Excuting main function'.
+%
+% \iffalse
+%</bgm.py>
+% \fi
+% ^^A ]]] End of section `Implemantation'.
+%
+% ^^A ]]] End of part `bgm.py'.
+%
+% \part{\texttt{references.py}}^^A [[[
+%
+% \section{Implemantation}^^A [[[
+%
+% \iffalse
+%<*references.py>
+% \fi
+%
+% \subsection{Importing modules}[updated=]^^A [[[
+% \begin{pythoncode}
+from argparse import ArgumentParser
+from os.path import exists, expanduser
+from os import remove
+import pandas as pd
+from  yaml import safe_load
+
+LATEX_PATH = expanduser("~") + '/Dropbox/configuration-files/latex/'
+FILENAME = LATEX_PATH + 'output-files/references/myreferences.bib'
+
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Importing modules'.
+%
+% \subsection{Defining \texttt{main} function}[updated=]^^A [[[
+% \begin{pythoncode}
+def main():
+    parser = ArgumentParser()
+    parser.add_argument('-a', '--all', help='show all entries in/on/at references.yaml', action='store_true')
+    args = parser.parse_args()
+    if exists(FILENAME):
+        remove(FILENAME)
+    input_file = LATEX_PATH + 'references.yaml'
+    with open(input_file, 'r') as f:
+        data = safe_load(f)
+        for categories in data:
+            for datum in data[categories]:
+                write_bib_file(datum)
+    if args.all:
+        with open(input_file, 'r') as f:
+            data = safe_load(f)
+            for categories in data:
+                print('\n', '='*30, categories, '='*30)
+                df = pd.DataFrame(data[categories])
+                print(df)
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Defining main function'.
+%
+% \subsection{Defining \texttt{write\_bib\_file} function}[updated=]^^A [[[
+% \begin{pythoncode}
+def write_bib_file(datum):
+    with open(FILENAME, 'a') as f:
+        print('@' + datum['type'] + '{' + datum['key'] + ',', file=f)
+        print('title="' + datum['title'] + '",', file=f)
+        for key in datum.keys():
+            if key == 'author':
+                print('author="' + '/'.join(datum['author']) + '",', file=f)
+            if key == 'publisher':
+                print('publisher="' + str(datum['publisher']) + '",', file=f)
+            if key == 'edition':
+                print('edition=' + str(datum['edition']) + ',', file=f)
+            if key == 'year':
+                print('year=' + str(datum['year']) + ',', file=f)
+            if key == 'url':
+                print('howpublished="URL: \\url{' + datum['url'] + '}",', file=f)
+        print('}', file=f)
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Defining write_bib_file function'.
+%
+% \subsection{Excuting main function}[updated=]^^A [[[
+% \begin{pythoncode}
+if __name__ == '__main__':
+    main()
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Excuting main function'.
+%
+% \iffalse
+%</references.py>
+% \fi
+%
+% ^^A ]]] End of section `Implemantation'.
+%
+% ^^A ]]] End of part `references.py'.
+%
+% \part{\texttt{to\_do\_list.py}}^^A [[[
+%
+% \section{Notes}^^A [[[
+%
+% \subsection{\texttt{to-do-list.yaml}}^^A [[[
+% \begin{myitemize}
+% \1 \yamlinline{due date}
+%   \2 \yamlinline{2022-01-01T09:30:00}
+%     \3 \href{https://yaml.org/spec/1.2.2/#24-tags#:~:text=Example%202.22%20Timestamps}{Example 2.22 Timestamps - yaml.org}
+% \end{myitemize}
+%
+% \iffalse
+%<*to-do-list.yaml>
+% \fi
+%
+% \begin{yamlcode}
+to-do list:
+- task: study statistics
+  due date: 2022-01-01T09:30:00
+  status: not started
+  notes:
+  - one
+  - two
+  - three
+  updated: 2023-06-17T15:09:47
+- task: buy book
+...
+% \end{yamlcode}
+%
+% \iffalse
+%</to-do-list.yaml>
+% \fi
+% ^^A ]]] End of subsection `to-do-list.yaml'.
+%
+% ^^A ]]] End of section `Notes'.
+%
+% \section{Implementation}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://www.delftstack.com/ja/howto/matplotlib/plot-table-using-matplotlib/}{Matplotlib で表をプロットする方法}
+% \1 
+% \1 
+% \end{myitemize}
+%
+% \iffalse
+%<*todolist.py>
+% \fi
+%
+% \subsection{Importing modules}[updated=]^^A [[[
+% \begin{pythoncode}
+from datetime import datetime
+from jinja2 import Environment, FileSystemLoader
+from my_module import FileConverter, HtmlCreator
+import pandas as pd
+
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Importing modules'.
+%
+% \subsection{Defining functions}[updated=]^^A [[[
+%
+% \subsubsection{\texttt{convert\_to\_html()}}[updated=]^^A [[[
+% \begin{pythoncode}
+def convert_to_html(data: dict, output_file_path: str):
+    html_creator = HtmlCreator(title='to-do list')
+    for heading in data.keys():
+        df = pd.DataFrame(data[heading], columns=['due date', 'status', 'task', 'notes'])
+        df['notes'] = df['notes'].apply(
+            lambda x: FileConverter._itemize_list_data(x, str_join='<br>', str_item=''))
+        df = df.sort_values(by='due date')
+        df = df.reset_index(drop=True)
+        html_creator.add_table(heading, df)
+    html_creator.create_html_file(output_file_path)
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `convert_to_html()'.
+%
+% \subsubsection{\texttt{main()}}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{-a/-all}
+%   \2 \man[keyword=-a]{ls}
+% \end{myitemize}
+%
+% \begin{pythoncode}
+def main():
+    args = FileConverter.parse_args(add_file_path_output=True)
+    to_do_list = FileConverter(args.file_path_input, None)
+    convert_to_html(to_do_list.orig_data, args.file_path_output)
+
+% \end{pythoncode}
+% ^^A ]]] End of subsubsection `main()'.
+%
+% ^^A ]]] End of subsection `Defining functions'.
+%
+% \subsection{Excuting \texttt{main} function}[updated=2023-06-17T15:11:44]^^A [[[
+% \begin{pythoncode}
+if __name__ == '__main__':
+    main()
+
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Excuting main function'.
+%
+% \iffalse
+%</todolist.py>
+% \fi
+%
+% \endinput
+%
+% \subsection{todolisttest1.py}[updated=2021-08-10T16:51:08]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{class ToDoList(QWidget):}の\pythoninline{QWidget}をinheritする理由
+%   \2 \href{https://doc.qt.io/qtforpython-5/quickstart.html#create-a-simple-application}{Create a Simple Application}
+%   \2 \pythoninline{QWidget}は\pythoninline{QMainWindow}のparent
+% \1 \pythoninline{layout = QGridLayout()}, \pythoninline{self.setLayout(layout)}
+%   \2 \href{https://doc.qt.io/qtforpython-5/quickstart.html#create-a-simple-application}{Create a Simple Application}
+% \1 \pythoninline{QGridLayout()} or \pythoninline{QHBoxLayout()} or ...
+%   \2 \href{https://doc.qt.io/qtforpython-5/overviews/layout.html#horizontal-vertical-grid-and-form-layouts}{Horizontal, Vertical, Grid, and Form Layouts}
+% \end{myitemize}
+%
+% \iffalse
+%<*todolisttest1.py>
+% \fi
+%
+% \begin{pythoncode}
+from PyQt5.QtWidgets import QApplication, QGridLayout, QLabel, QTabWidget, QWidget
+import sys
+
+class ToDoList(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle('Test 1')
+        self.setGeometry(0, 0, 1500, 1000)
+
+        layout = QGridLayout()
+        self.setLayout(layout)
+
+        tabwidget = QTabWidget()
+        layout.addWidget(tabwidget, 0, 0)
+
+        label1 = QLabel("Widget in Tab 1.")
+        label2 = QLabel("Widget in Tab 2.")
+
+        tabwidget.addTab(label1, 'Tab 1')
+        tabwidget.addTab(label2, 'Tab 2')
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = ToDoList()
+    win.show()
+    sys.exit(app.exec())
+% \end{pythoncode}
+%
+% \iffalse
+%</todolisttest1.py>
+% \fi
+%
+% ^^A ]]] End of subsection `todolisttest1.py'.
+%
+% \subsection{todolisttest2.py}[updated=2021-08-10T17:49:28]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{tab1 = QWidget()}
+%   \2 \href{https://github.com/pyqt/examples/blob/_/src/02%20PyQt%20Widgets/main.py}{2 PyQt Widgets}
+% \1 \pythoninline{QSqlDatabase}, \pythoninline{QSqlTableModel()}
+%   \2 \href{https://github.com/pyqt/examples/blob/_/src/15%20PyQt%20database%20example/main.py}{15 PyQt database example}
+% \1 \pythoninline{resizeColumnToContents(column)}
+%   \2 \href{https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QTableView.html#PySide2.QtWidgets.PySide2.QtWidgets.QTableView.resizeColumnToContents}{resizeColumnToContents()}
+% \end{myitemize}
+%
+% The normal way to use \pythoninline{QTabWidget} is to do the following
+% \urlref{https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QTabWidget.html#detailed-description}{QTabWidget}:
+% \begin{myitemize}[enumerate]
+% \1 Create a \pythoninline{QTabWidget}.
+% \1 Create a \pythoninline{QWidget} for each of the pages in the tab dialog, but do not specify parent widgets for them.
+% \1 Insert child widgets into the page widget, using layouts to position them as normal.
+% \1 Call \pythoninline{addTab()} or \pythoninline{insertTab()} to put the page widgets into the tab widget,
+% giving each tab a suitable label with an optional keyboard shortcut.
+% \end{myitemize}
+%
+% \iffalse
+%<*todolisttest2.py>
+% \fi
+%
+% \begin{pythoncode}
+from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
+from PyQt5.QtWidgets import QApplication, QGridLayout, QTableView, QTabWidget, QWidget
+import sys
+
+class ToDoList(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle('Test 2')
+        self.setGeometry(0, 0, 1500, 1000)
+
+        layout = QGridLayout()
+        self.setLayout(layout)
+
+        tabWidget = QTabWidget()
+        layout.addWidget(tabWidget, 0, 0)
+
+        self.tab1 = QWidget()
+        self.tab2 = QWidget()
+
+        layoutTab1 = QGridLayout()
+        self.tab1.setLayout(layoutTab1)
+        tableView = QTableView()
+        layoutTab1.addWidget(tableView, 0, 0)
+
+        db = QSqlDatabase.addDatabase('QSQLITE')
+        db.setDatabaseName("/home/yasutaka/my-documents/etc/etc/output-files/to-do-list-data-2021-08-09T23:07:01.275427.db")
+        db.open()
+        model = QSqlTableModel(None, db)
+        model.setTable('someday')
+        model.select()
+
+        tableView.setModel(model)
+
+        tableView.resizeColumnToContents(1)
+        tableView.resizeColumnToContents(2)
+
+        tabWidget.addTab(self.tab1, 'Tab 1')
+        tabWidget.addTab(self.tab2, 'Tab 2')
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = ToDoList()
+    win.show()
+    sys.exit(app.exec())
+% \end{pythoncode}
+%
+% \iffalse
+%</todolisttest2.py>
+% \fi
+%
+% ^^A ]]] End of subsection `todolisttest2.py'.
+%
+% \subsection{todolisttest3.py}[updated=2021-08-10T21:58:59]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{model1}, \pythoninline{model2}で分けないと上手くいかない
+% \end{myitemize}
+%
+% \iffalse
+%<*todolisttest3.py>
+% \fi
+%
+% \begin{pythoncode}
+from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
+from PyQt5.QtWidgets import QApplication, QGridLayout, QTableView, QTabWidget, QWidget
+import sys
+
+class ToDoList(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle('Test 3')
+        self.setGeometry(0, 0, 1500, 1000)
+
+        layout = QGridLayout()
+        self.setLayout(layout)
+
+        tabWidget = QTabWidget()
+        layout.addWidget(tabWidget, 0, 0)
+
+        tab1 = QWidget()
+        tab2 = QWidget()
+
+        self.layoutTab1 = QGridLayout()
+        self.layoutTab2 = QGridLayout()
+
+        tab1.setLayout(self.layoutTab1)
+        tab2.setLayout(self.layoutTab2)
+
+        self.update()
+
+        tabWidget.addTab(tab1, 'Immediately')
+        tabWidget.addTab(tab2, 'Someday')
+
+    def update(self):
+        self.tableView1 = QTableView()
+        self.tableView2 = QTableView()
+
+        self.layoutTab1.addWidget(self.tableView1, 0, 0)
+        self.layoutTab2.addWidget(self.tableView2, 0, 0)
+
+        self.db = QSqlDatabase.addDatabase('QSQLITE')
+        self.db.setDatabaseName("/home/yasutaka/Dropbox/config-files/etc/output-files/python/to-do-list-data/to-do-list-data---sample.db")
+        self.db.open()
+        model1 = QSqlTableModel(None, self.db)
+        model2 = QSqlTableModel(None, self.db)
+
+        model1.setTable('immediately')
+        model1.select()
+        self.tableView1.setModel(model1)
+
+        model2.setTable('someday')
+        model2.select()
+        self.tableView2.setModel(model2)
+
+        self.tableView1.resizeColumnToContents(1)
+        self.tableView1.resizeColumnToContents(2)
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = ToDoList()
+    win.show()
+    sys.exit(app.exec())
+% \end{pythoncode}
+%
+% \iffalse
+%</todolisttest3.py>
+% \fi
+%
+% ^^A ]]] End of subsection `todolisttest3.py'.
+%
+% \subsection{todolisttest4.py}[updated=2021-08-15T00:12:00]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{QPushButton()}
+%   \2 \href{https://github.com/pyqt/examples/blob/_/src/04%20PyQt%20Signals%20and%20Slots/main.py}{04 PyQt Signals and Slots}
+% \1 \pythoninline{glob.glob()}
+%   \2 \mycite[page=246]{introducting-python}
+% \2 \pythoninline{try: ... except: ...}
+%   \2 \mycite[page=104]{introducting-python}
+% \2 \pythoninline{Error occurred.}
+%   \2 \mycite[page=104]{introducting-python}
+% \2 \pythoninline{class AddWindow()}
+%   \2 \href{https://www.pythonguis.com/tutorials/creating-multiple-windows/}{Creating additional windows}
+% \2 \pythoninline{hide()}
+%   \2 \href{https://www.pythonguis.com/tutorials/creating-multiple-windows/}{Creating additional windows}
+% \end{myitemize}
+%
+% \iffalse
+%<*todolisttest4.py>
+% \fi
+%
+% \begin{pythoncode}
+from glob import glob
+from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
+from PyQt5.QtWidgets import QApplication, QGridLayout, QPushButton, QTableView, QTabWidget, QWidget
+import sys
+
+class AddWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QGridLayout()
+        self.setLayout(layout)
+
+        button = QPushButton('test')
+        layout.addWidget(button, 0, 0)
+
+class ToDoList(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle('Test 4')
+        self.setGeometry(0, 0, 1500, 1000)
+
+        layout = QGridLayout()
+        self.setLayout(layout)
+
+        tabWidget = QTabWidget()
+        layout.addWidget(tabWidget, 0, 0)
+
+        tab1 = QWidget()
+        tab2 = QWidget()
+
+        self.layoutTab1 = QGridLayout()
+        self.layoutTab2 = QGridLayout()
+
+        tab1.setLayout(self.layoutTab1)
+        tab2.setLayout(self.layoutTab2)
+
+        self.update()
+
+        tabWidget.addTab(tab1, 'Immediately')
+        tabWidget.addTab(tab2, 'Someday')
+
+        addButton = QPushButton('Add')
+        layout.addWidget(addButton, 1, 0)
+        addButton.clicked.connect(self.addButtonClicked)
+
+        updateButton = QPushButton('Update')
+        layout.addWidget(updateButton, 1, 1)
+        updateButton.clicked.connect(self.updateButtonClicked)
+
+        self.addWindow = None
+
+    def update(self):
+        self.tableView1 = QTableView()
+        self.tableView2 = QTableView()
+
+        self.layoutTab1.addWidget(self.tableView1, 0, 0)
+        self.layoutTab2.addWidget(self.tableView2, 0, 0)
+
+        self.db = QSqlDatabase.addDatabase('QSQLITE')
+        self.db.setDatabaseName(ToDoList.return_latest_file())
+        self.db.open()
+        model1 = QSqlTableModel(None, self.db)
+        model2 = QSqlTableModel(None, self.db)
+
+        model1.setTable('immediately')
+        model1.select()
+        self.tableView1.setModel(model1)
+
+        model2.setTable('someday')
+        model2.select()
+        self.tableView2.setModel(model2)
+
+        self.tableView1.resizeColumnToContents(1)
+        self.tableView1.resizeColumnToContents(2)
+
+    def updateButtonClicked(self):
+        self.db.setDatabaseName("/home/yasutaka/Dropbox/config-files/etc/output-files/python/to-do-list-data/to-do-list-data---sample2.db")
+        self.db.open()
+        model1 = QSqlTableModel(None, self.db)
+        model1.setTable('immediately')
+        model1.select()
+        self.tableView1.setModel(model1)
+
+    def return_latest_file():
+        to_do_list_data_files = glob('/home/yasutaka/Dropbox/config-files/etc/output-files/python/to-do-list-data/to-do-list-data---*.db')
+
+        try:
+            return to_do_list_data_files[-1]
+        except:
+            print('Error occurred.')
+
+        # if to_do_list_data_files == []:
+            # print('Error occurred.')
+        # else:
+            # to_do_list_file = self.to_do_list_files.sort(reverse=True)
+            # print(to_do_list_data_files)
+            # print(to_do_list_data_files[-1])
+            # return to_do_list_data_files[-1]
+
+    def addButtonClicked(self):
+        self.addWindow = AddWindow()
+
+        if self.isVisible():
+            self.hide()
+            self.addWindow.show()
+        else:
+            self.addWindow.show()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = ToDoList()
+    win.show()
+    sys.exit(app.exec())
+% \end{pythoncode}
+%
+% \iffalse
+%</todolisttest4.py>
+% \fi
+%
+% ^^A ]]] End of subsection `todolisttest4.py'.
+%
+% \subsection{todolisttest5.py}[updated=2021-08-15T00:11:17]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{QFormLayout()}
+%   \2 \href{https://www.tutorialspoint.com/pyqt/pyqt_qformlayout_class.htm}{PyQt - QFormLayout Class}
+% \1 \pythoninline{QComboBox()}
+%   \2 \href{https://www.mfitzp.com/forum/t/qdatawidgetmapper-with-relational-model-and-qcomboxes-working-of-relations/1009}{QDataWidgetMapper with relational model and qcomboxes working of relations}
+% \1 \pythoninline{'***: '}
+%   \2 \href{https://doc.qt.io/qtforpython/examples/example_sql__books.html}{SQL Books Example}
+% \end{myitemize}
+%
+% \iffalse
+%<*todolisttest5.py>
+% \fi
+%
+% \begin{pythoncode}
+from PyQt5.QtWidgets import QApplication, QComboBox, QFormLayout, QLabel, QLineEdit, QGridLayout, QPushButton, QWidget
+import sys
+
+class AddWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        # layout = QGridLayout()
+        # self.setLayout(layout)
+
+        form = QFormLayout()
+        form.addRow(QLabel('Deadline:'), QLineEdit())
+
+        status = QComboBox()
+        status.addItems(['Not started', 'In progress', 'Completed'])
+        form.addRow(QLabel('Status:'), status)
+
+        self.setLayout(form)
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = AddWindow()
+    win.show()
+    sys.exit(app.exec())
+% \end{pythoncode}
+%
+% \iffalse
+%</todolisttest5.py>
+% \fi
+%
+% ^^A ]]] End of subsection `todolisttest5.py'.
+%
+%
+%
+%
+%
+%
+%
+%
+% \iffalse
+%<*to-do-list---old.py>
+%
+% \section{To-do list app}^^A [[[
+%
+% \subsection{download-image.py}^^A [[[
+%
+%
+% \begin{pythoncode}
+import os
+import pprint
+import time
+import urllib.error
+import urllib.request
+
+def download_file(url, dst_path):
+    try:
+        with urllib.request.urlopen(url) as web_file:
+            data = web_file.read()
+            with open(dst_path, mode='wb') as local_file:
+                local_file.write(data)
+    except urllib.error.URLError as e:
+        print(e)
+
+#  url = 'https://image.freepik.com/free-icon/todo_318-10185.jpg'
+url = 'https://cdn.icon-icons.com/icons2/1709/PNG/512/checked2_112475.png'
+dst_path = './icon.png'
+download_file(url, dst_path)
+
+# 参考サイト：https://note.nkmk.me/python-download-web-images/
+
+
+% \end{pythoncode}
+% ^^A ]]] End of subsection `download-image.py'.
+%
+% \subsection{to-do-list.py}^^A [[[
+%
+% \begin{pythoncode}
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import datetime
+import os
+import sqlite3
+import sys
+import time
+
+try:
+    import tkinter as tk
+    import tkinter.ttk as ttk
+    from tkinter import messagebox
+except ImportError:
+    import Tkinter as tk
+    import tkMessageBox
+    import ttk
+
+
+
+class ToDoListApplication():# [[[
+    label_first_column = 'Item/Thing to do'
+    label_second_column = 'Deadline/Date'
+    label_third_column = 'Detail(Place/Things to bring/...)'
+
+    def __init__(self, master):# [[[
+        self.master = master
+
+        self.master.title('To-do List')
+        self.master.geometry('1000x500')
+
+        self.read_data()
+        self.show_current_time()
+        self.show_to_do_list()
+        self.show_buttons()
+
+        self.selected = []
+    # ]]]
+
+    def show_current_time(self):# [[[
+        self.main_frame_current_time = tk.Frame(self.master)
+
+        self.label_current_time = tk.Label(
+            self.main_frame_current_time,
+            #  font=('Verdana', 18),
+            font=('Helvetica', 30),
+            text=time.strftime('%A %B %d %H:%M', time.localtime()))
+        self.label_current_time.pack()
+
+        self.main_frame_current_time.pack()
+    # ]]]
+
+    def show_to_do_list(self):# [[[
+        self.configure_table()
+        self.update_to_do_list()
+
+        self.tree.bind('<<TreeviewSelect>>', self.on_select)
+    # ]]]
+
+
+
+
+    def show_buttons(self):# [[[
+        button_width = 6
+        self.main_frame_buttons = tk.Frame(self.master)
+
+        self.button_add = tk.Button(
+            self.main_frame_buttons,
+            text='Add',
+            width=button_width,
+            command=self.add_to_list)
+        self.button_add.grid(row=1, column=1)
+
+        self.button_modify = tk.Button(
+            self.main_frame_buttons,
+            text='Modify',
+            width=button_width,
+            command=self.modify_item)
+        self.button_modify.grid(row=1, column=2)
+
+        self.button_delete = tk.Button(
+            self.main_frame_buttons,
+            text='Delete',
+            width=button_width,
+            command=self.delete_selections)
+        self.button_delete.grid(row=1, column=3)
+
+        self.button_quit = tk.Button(
+            self.main_frame_buttons,
+            text='Quit',
+            width=button_width,
+            command=self.close_window)
+        self.button_quit.grid(row=1, column=4)
+
+        self.main_frame_buttons.pack()
+    # ]]]
+
+    def add_to_list(self):# [[[
+        self.new_window = tk.Toplevel(self.master)
+        self.new_window.grab_set()
+        self.app = WindowForAdding(self.new_window)
+        self.update_to_do_list()
+    # ]]]
+
+    def modify_item(self):# [[[
+        if not len(self.selected) == 1:
+            error_message = 'Select one item from to-do list.'
+            try:
+                messagebox.showerror('Error', error_message)
+            except:
+                tkMessageBox.showerror('Error', error_message)
+        else:
+            self.new_window = tk.Toplevel(self.master)
+            self.new_window.grab_set()
+            self.app = WindowForModifying(
+                self.new_window,
+                self.tree.item(self.selected[0])['tags'][0])
+            self.update_to_do_list()
+    # ]]]
+
+    def delete_selections(self):# [[[
+        for idx in self.selected:
+            del to_do_list_data[self.tree.item(idx)['tags'][0]]
+        self.update_to_do_list()
+    # ]]]
+
+    def on_select(self, event):# [[[
+        self.selected = event.widget.selection()
+    # ]]]
+
+    def close_window(self):# [[[
+        self.write_data()
+        self.master.destroy()
+    # ]]]
+
+# ]]]
+
+class NewWindowBase():# [[[
+    #  font_label_frame = 'Verdana 15 bold'
+    font_label_frame = 'Calibri 15 bold'
+
+    def __init__(self, master):# [[[
+        self.master = master
+
+        self.show_entry_item()
+        self.show_entry_deadline()
+        self.show_entry_detail()
+        self.show_buttons()
+    # ]]]
+
+    def show_entry_item(self):# [[[
+        self.sub_frame_item = tk.Frame(self.master)
+        self.label_frame_item = tk.LabelFrame(
+            self.sub_frame_item,
+            font=NewWindowBase.font_label_frame,
+            text=ToDoListApplication.label_first_column)
+
+        self.label_item = tk.Label(
+            self.label_frame_item,
+            text=ToDoListApplication.label_first_column + ': ')
+        self.label_item.grid(row=1, column=1)
+        self.entry_item = tk.Entry(self.label_frame_item)
+        self.entry_item.grid(row=1, column=2)
+
+        self.label_frame_item.pack()
+        self.sub_frame_item.pack()
+    # ]]]
+
+    def show_entry_deadline(self):# [[[
+        self.sub_frame_deadline = tk.Frame(self.master)
+        self.label_frame_deadline = tk.LabelFrame(
+            self.sub_frame_deadline,
+            font=NewWindowBase.font_label_frame,
+            text=ToDoListApplication.label_second_column)
+
+        self.years = [2019+i for i in range(2)]
+        self.label_deadline_year = tk.Label(self.label_frame_deadline, text='Year: ')
+        self.label_deadline_year.grid(row=1, column=1)
+        self.entry_deadline_year = ttk.Combobox(
+            self.label_frame_deadline,
+            values=self.years,
+            width=4)
+        self.entry_deadline_year.grid(row=1, column=2)
+
+        self.months = [i+1 for i in range(12)]
+        self.label_deadline_month = tk.Label(self.label_frame_deadline, text='Month: ')
+        self.label_deadline_month.grid(row=1, column=3)
+        self.entry_deadline_month = ttk.Combobox(
+            self.label_frame_deadline,
+            values=self.months,
+            width=2)
+        self.entry_deadline_month.grid(row=1, column=4)
+
+        self.days = [i+1 for i in range(31)]
+        self.label_deadline_day = tk.Label(self.label_frame_deadline, text='Day: ')
+        self.label_deadline_day.grid(row=1, column=5)
+        self.entry_deadline_day = ttk.Combobox(
+            self.label_frame_deadline,
+            values=self.days,
+            width=2)
+        self.entry_deadline_day.grid(row=1, column=6)
+
+        self.hours = [i for i in range(25)]
+        self.minutes = [i for i in range(0, 60, 15)]
+        self.label_deadline_hour = tk.Label(self.label_frame_deadline, text='Time: ')
+        self.label_deadline_hour.grid(row=1, column=7)
+        self.entry_deadline_hour = ttk.Combobox(
+            self.label_frame_deadline,
+            values=self.hours,
+            width=2)
+        self.entry_deadline_hour.grid(row=1, column=8)
+        tk.Label(self.label_frame_deadline, text=':').grid(row=1, column=9)
+        self.entry_deadline_minute = ttk.Combobox(
+            self.label_frame_deadline,
+            values=self.minutes,
+            width=2)
+        self.entry_deadline_minute.grid(row=1, column=10)
+
+        self.label_frame_deadline.pack()
+        self.sub_frame_deadline.pack()
+    # ]]]
+
+    def show_entry_detail(self):# [[[
+        self.sub_frame_detail = tk.Frame(self.master)
+        self.label_frame_detail = tk.LabelFrame(
+            self.sub_frame_detail,
+            font=NewWindowBase.font_label_frame,
+            text=ToDoListApplication.label_third_column)
+
+        self.label_detail = tk.Label(
+            self.label_frame_detail,
+            text=ToDoListApplication.label_third_column + ': ')
+        self.label_detail.grid(row=1, column=1)
+        self.entry_detail = tk.Entry(self.label_frame_detail, width=50)
+        self.entry_detail.grid(row=1, column=2)
+
+        self.label_frame_detail.pack()
+        self.sub_frame_detail.pack()
+    # ]]]
+
+    def set_entries(self):# [[[
+        pass
+    # ]]]
+
+    def show_buttons(self):# [[[
+        button_width = 6
+        self.sub_frame_buttons = tk.Frame(self.master)
+
+        self.button_ok = tk.Button(
+            self.sub_frame_buttons,
+            text='OK',
+            width=button_width,
+            command=self.ok_button_clicked)
+        self.button_ok.grid(row=1, column=1)
+
+        self.button_cancel = tk.Button(
+            self.sub_frame_buttons,
+            text='Cancel',
+            width=button_width,
+            command=self.cancel)
+        self.button_cancel.grid(row=1, column=2)
+
+        self.sub_frame_buttons.pack()
+    # ]]]
+
+    def ok_button_clicked(self):# [[[
+        pass
+    # ]]]
+
+    def read_entries_and_check_if_date_is_valid(self):# [[[
+        # namingの由来
+        # https://codereview.stackexchange.com/questions/200634/program-to-check-if-a-date-is-valid-or-not
+        year = int(self.entry_deadline_year.get())
+        month = int(self.entry_deadline_month.get())
+        day = int(self.entry_deadline_day.get())
+        hour = int(self.entry_deadline_hour.get())
+        minute = int(self.entry_deadline_minute.get())
+        try:
+            if sys.version_info.major == 3:
+                self.unix_time = datetime.datetime(year, month, day, hour, minute).timestamp()
+            else:
+                self.unix_time = time.mktime(datetime.datetime(year, month, day, hour, minute).timetuple())
+            return True
+        except ValueError:
+            return False
+    # ]]]
+
+    def add_to_list(self):# [[[
+        if self.read_entries_and_check_if_date_is_valid():
+            temp_data = {}
+            temp_data['item'] = self.entry_item.get()
+            temp_data['deadline'] = self.unix_time
+            temp_data['detail'] = self.entry_detail.get()
+            to_do_list_data.append(temp_data)
+            app.update_to_do_list()
+            self.master.destroy()
+        else:
+            error_message = "Invalid date is input."
+            try:
+                messagebox.showerror('Error', error_message)
+            except:
+                tkMessageBox.showerror('Error', error_message)
+    # ]]]
+
+    def cancel(self):# [[[
+        self.master.destroy()
+    # ]]]
+
+# ]]]
+
+class WindowForAdding(NewWindowBase):# [[[
+
+    def __init__(self, master):# [[[
+        self.master = master
+
+        self.show_entry_item()
+        self.show_entry_deadline()
+        self.show_entry_detail()
+        self.show_buttons()
+
+        self.set_entries()
+    # ]]]
+
+    def set_entries(self):# [[[
+        now = datetime.date.today()
+
+        self.entry_deadline_year.set(now.year)
+        self.entry_deadline_month.set(now.month)
+        self.entry_deadline_day.set(now.day)
+        self.entry_deadline_hour.set(self.hours[0])
+        self.entry_deadline_minute.set(self.minutes[0])
+    # ]]]
+
+    def ok_button_clicked(self):# [[[
+        self.add_to_list()
+    # ]]]
+
+# ]]]
+
+class WindowForModifying(NewWindowBase):# [[[
+
+    def __init__(self, master, selected):# [[[
+        self.master = master
+        self.selected = selected
+
+        self.show_entry_item()
+        self.show_entry_deadline()
+        self.show_entry_detail()
+        self.show_buttons()
+        
+        self.set_entries()
+    # ]]]
+
+    def set_entries(self):# [[[
+        temp = to_do_list_data[self.selected]
+        
+        self.entry_item.insert(0, temp['item'])
+        self.entry_detail.insert(0, temp['detail'])
+
+        temp_time = datetime.datetime.fromtimestamp(temp['deadline'])
+        self.entry_deadline_year.set(temp_time.year)
+        self.entry_deadline_month.set(temp_time.month)
+        self.entry_deadline_day.set(temp_time.day)
+        self.entry_deadline_hour.set(temp_time.hour)
+        self.entry_deadline_minute.set(temp_time.minute)
+    # ]]]
+
+    def ok_button_clicked(self):# [[[
+        self.add_to_list()
+        if not self.read_entries_and_check_if_date_is_valid():
+            del to_do_list_data[self.selected]
+    # ]]]
+
+# ]]]
+
+# End --------------------------------------------------
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Title'.
+%
+% ^^A ]]] End of section `To-do list app'.
+%
+%</to-do-list---old.py>
+% \fi
+%
+% \iffalse
+%<*todolist--------old.py>
+% \fi
+%
+% \section{Importing modules}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 
+% \1 
+% \end{myitemize}
+%
+% \begin{pythoncode}
+from datetime import datetime
+import glob
+import os
+from PyQt5.QtCore import *
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtSql import *
+from PyQt5.QtWidgets import QWidget, QApplication, QGridLayout, QLabel, QTabWidget, QTableWidget, QTableWidgetItem, QHBoxLayout, QTableView, QShortcut
+import sqlite3
+import sys
+
+
+% \end{pythoncode}
+% ^^A ]]] End of section `Importing modules'.
+%
+% \section{ToDoList class}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 code ref
+%   \2 \href{https://pythonbasics.org/pyqt-tabwidget/}{PyQt TabWidget}
+%   \2 \href{https://github.com/pyqt/examples/blob/_/src/02%20PyQt%20Widgets/main.py}{main.py}
+%   \2 \href{https://github.com/pyqt/examples/tree/_/src/15%20PyQt%20database%20example}{PyQt database example}
+% \1 \pythoninline{setHorizontalHeaderLabels()}
+%   \2 \href{https://linuxhint.com/use-pyqt-qtablewidget/}{How to Use PyQt QTableWidget}
+% \1 \pythoninline{QHBoxLayout()}
+%   \2 The \pythoninline{QHBoxLayout} class lines up widgets horizontally
+%   \urlref{https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QHBoxLayout.html}{QHBoxLayout}.
+% \1 \pythoninline{QShortcut}
+%   \2 \href{https://zetcode.com/pyqt/qshortcut/#:~:text=PyQt%20QShortcut%20simple%20example&text=The%20Ctrl%20%2B%20M%20shortcut%20is,to%20the%20main%20window%20widget.&text=We%20connect%20a%20lambda%20function,activated%20signal%20of%20the%20shortcut.&text=The%20Ctrl%20%2B%20Q%20shortcut%20terminates%20the%20application.}{PyQt QShortcut}
+% \end{myitemize}
+%
+% \begin{pythoncode}
+class ToDoList(QWidget):
+% \end{pythoncode}
+%
+% \subsection{Constructor}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{***}
+%   \2 
+% \end{myitemize}
+%
+% \begin{pythoncode}
+    def __init__(self):
+        QWidget.__init__(self)
+
+        self.setWindowTitle('To-do list')
+        self.setGeometry(0, 0, 1500, 1000)
+
+        layout = QGridLayout()
+        self.setLayout(layout)
+
+
+        tab1 = QWidget()
+        tableWidget = QTableWidget(10, 10)
+        tableWidget.setHorizontalHeaderLabels(['Deadline', 'Item', 'Detail', 'Status'])
+        tableWidget.setRowCount(len(to_do_list_data))
+        tableWidget.setColumnCount(4)
+        for i in range(len(to_do_list_data)):
+            tableWidget.setItem(i, 0, QTableWidgetItem(str(to_do_list_data[i]['deadline'])))
+            tableWidget.setItem(i, 1, QTableWidgetItem(to_do_list_data[i]['item']))
+            tableWidget.setItem(i, 2, QTableWidgetItem(to_do_list_data[i]['detail']))
+            tableWidget.setItem(i, 3, QTableWidgetItem(to_do_list_data[i]['status']))
+
+        tab1hbox = QHBoxLayout()
+        tab1hbox.setContentsMargins(5, 5, 5, 5)
+        tab1hbox.addWidget(tableWidget)
+        tab1.setLayout(tab1hbox)
+
+
+        tab2 = QWidget()
+        tableWidget2 = QTableWidget(10, 10)
+        tableWidget2.setHorizontalHeaderLabels(['Deadline', 'Item', 'Detail', 'Status'])
+        tableWidget2.setRowCount(len(to_do_list_data_2))
+        tableWidget2.setColumnCount(4)
+        for i in range(len(to_do_list_data_2)):
+            tableWidget2.setItem(i, 0, QTableWidgetItem(str(to_do_list_data_2[i]['deadline'])))
+            tableWidget2.setItem(i, 1, QTableWidgetItem(to_do_list_data_2[i]['item']))
+            tableWidget2.setItem(i, 2, QTableWidgetItem(to_do_list_data_2[i]['detail']))
+
+        tab2hbox = QHBoxLayout()
+        tab2hbox.setContentsMargins(5, 5, 5, 5)
+        tab2hbox.addWidget(tableWidget2)
+        tab2.setLayout(tab2hbox)
+
+
+
+        label1 = QLabel("Widget in Tab 1.")
+        label2 = QLabel("Widget in Tab 2.")
+        tabwidget = QTabWidget()
+        tabwidget.addTab(tab1, 'Immediately')
+        tabwidget.addTab(tab2, 'Someday')
+        layout.addWidget(tabwidget, 0, 0)
+
+        self.quit = QShortcut(QKeySequence('Ctrl+Q'), self)
+        self.quit.activated.connect(QApplication.instance().quit)
+        self.read()
+% \end{pythoncode}
+% ^^A ]]] End of subsection `Constructor'.
+%
+% \subsection{read}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \pythoninline{sort(reverse=True)}
+%   \2 \mycite[page=50]{introducting-python}
+% \1 \pythoninline{curs.execute('SELECT * FROM to_do_list ORDER BY deadline')}
+%   \2 \mycite[page=197]{introducting-python}
+% \end{myitemize}
+%
+% \begin{pythoncode}
+    def read(self):
+        to_do_list_data_files = glob.glob('/home/yasutaka/my-documents/etc/etc/output-files/to-do-list-data*.db')
+
+        if to_do_list_data_files == []:
+            print('!!!!! Error !!!!!!')
+        else:
+            # to_do_list_file = self.to_do_list_files.sort(reverse=True)
+            to_do_list_file = to_do_list_files[-1]
+            # print(to_do_list_file)
+
+
+
+
+        if os.path.exists(to_do_list_data_file):
+            conn = sqlite3.connect(to_do_list_data_file)
+            curs = conn.cursor()
+            curs.execute('SELECT * FROM to_do_list ORDER BY deadline')
+            rows = curs.fetchall()
+            for row in rows:
+                temp_data = {}
+                temp_data['item'] = row[0]
+                temp_data['deadline'] = row[1]
+                temp_data['detail'] = row[2]
+                test.append(temp_data)
+            curs.close()
+            conn.close()
+            # print(test)
+        else:
+            fout = open(to_do_list_data_file, 'w')
+            fout.close()
+% \end{pythoncode}
+% ^^A ]]] End of subsection `class'.
+%
+% ^^A ]]] End of section `class'.
+%
+% \section{main function}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 code
+%   \2 \urlref{https://pythonbasics.org/pyqt-table/}{How to use Tables in PyQt}
+% \end{myitemize}
+%
+% \begin{pythoncode}
+def main(args):
+    app = QApplication(args)
+    win = ToDoList()
+    win.show()
+    sys.exit(app.exec())
+
+if __name__ == '__main__':
+    main(sys.argv)
+% \end{pythoncode}
+% ^^A ]]] End of section `main function'.
+%
+% \iffalse
+%</todolist--------old.py>
+% \fi
+%
+% ^^A ]]] End of section `Implementation'.
+%
+% ^^A ]]] End of part `to_do_list.py'.
+%
+% \part{\texttt{template.html.jinja}}^^A [[[
+% \begin{myitemize}
+% \1 The origin of `template.html.jinja'
+%   \2 Adding a \verb|.jinja| extension, like \verb|user.html.jinja| may make it easier for some IDEs or editor plugins,
+%   but is not required.
+%   \urlref{https://jinja.palletsprojects.com/en/3.1.x/templates/#template-file-extension}{Template File Extension}
+%   \2 \mycite[keyword=Jinja (template engine)]{wikipedia}
+% \1 \href{https://html.spec.whatwg.org/#semantics-2}{3.2.1 Semantics}
+% \1 \htmlinline{<meta charset="UTF-8">}を入れないとAndroidで見るときに文字化けしてしまう
+% \1 \href{https://qiita.com/yun_bow/items/d845a2b3389fc8ca7ae1}{[Bootstrap-Table] JavaScriptでテーブル表示（その5）拡張機能}
+% \href{https://bootstrap-table.com/docs/extensions/filter-control/}{Table Filter Control}
+% \1 \htmlinline{<header>}, \htmlinline{main}
+%   \2 \href{https://web-de-asobo.net/2021/09/10/header-footer-main-tag/}{Webページ構造の基本（header・footer・mainタグ）}
+% \1 \htmlinline{}
+%   \2 \href{https://web-saku.net/javascript-prism/}{ソースコードをシンタックスハイライト表示できる”Prism.js”の使い方}
+%   \2 \href{https://cdnjs.com/libraries/prism}{prism}
+% \1 \href{https://www.sliderrevolution.com/resources/html-calendar/}{CSS and HTML calendar examples to add to your site}
+% \end{myitemize}
+%
+% \iffalse
+%<*template.html.jinja>
+% \fi
+% \begin{htmlcode}
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="configuration-files/miscellaneous/output-files/miscellaneous/mystyle.css">
+    <link rel="stylesheet" href="/home/yasutaka/Dropbox/configuration-files/miscellaneous/output-files/miscellaneous/mystyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.css" integrity="sha512-lTmd0bFMM2Ttm/S8V5dywYNiJaSyF5PILZosvAIzW4EJ7JLEYflk9ImyYIxw5KlFz7e9ZCJN53rnvPnefD240w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+  <body  onload="myFilter()">
+    <header>
+      <button id="openNav" onclick="openSidebar()">&#9776;</button>
+      <time>Updated: {{ updated }}</time>
+    </header>
+    <aside class="sidebar" style="display:none" id="mySidebar">
+      <button onclick="closeSidebar()">Close &times;</button>
+      {% for heading in headings %}
+      <a href="#{{ heading }}">{{ heading }}</a>
+      {% endfor %}
+    </aside>
+    <main>
+      <label><input type="checkbox" id="showAll" onchange="myFilter()">Show all</label>
+      <input type="text" id="myInput" onkeyup="mySearch()" placeholder="Search for names...">
+      {{ main_body }}
+    </main>
+    <script src="configuration-files/miscellaneous/output-files/miscellaneous/utilities.js"></script>
+    <script src="/home/yasutaka/Dropbox/configuration-files/miscellaneous/output-files/miscellaneous/utilities.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-SkmBfuA2hqjzEVpmnMt/LINrjop3GKWqsuLSSB3e7iBmYK7JuWw4ldmmxwD9mdm2IRTTi0OxSAfEGvgEi0i2Kw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </body>
+</html>
+% \end{htmlcode}
+% \iffalse
+%</template.html.jinja>
+% \fi
+% ^^A ]]] End of part `template.html.jinja'.
+%
+% ^^A End of file `python.dtx'.

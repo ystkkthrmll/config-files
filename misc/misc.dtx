@@ -1,0 +1,793 @@
+%
+% ^^A Configuring DocStrip [[[
+% \iffalse
+%<*driver>
+\input mydocstrip
+\mygenerate[output-files/misc]{
+  analog-clock.desktop,
+  bookmarks.home,
+  bookmarks.office,
+  compose.yaml,
+  config.home,
+  config.office,
+  Dockerfile,
+  .gitconfig.home,
+  .gitconfig.office,
+  .gitignore,
+  .gitmessage,
+  gnome-terminal.desktop,
+  google-chrome.desktop,
+  mystyle.css,
+  requirements.txt,
+  utilities.js,
+}
+\myrenamefile[output-files/misc]{Dockerfile.tex}{Dockerfile}
+\myendbatchfile
+\mydriver[
+  show-notes,
+]
+%</driver>
+% \fi
+% ^^A ]]] End of Configuring DocStrip
+%
+% \mytitle{Miscellaneous configuration files}
+%
+% \begin{abstract}^^A [[[
+% \begin{myitemize}
+% \1 \verb|analog-clock.desktop|, \verb|gnome-terminal.desktop|, \verb|google-chrome.desktop| (autostart)
+% \1 \verb|bookmarks.home|, \verb|bookmarks.office|
+%   \2 GNOME Filesのsidebarに登録するdirectories
+% \1 \verb|.gitconfig.home|, \verb|.gitconfig.office|, \verb|.gitignore|
+% \end{myitemize}
+% \end{abstract}^^A ]]]
+%
+% \mytableofcontents
+%
+% \part{Docker}[updated=]^^A [[[
+%
+% \section{\texttt{compose.yaml}}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \bashinline{docker compose up [-d]}
+% \1 References:
+%   \2 \href{https://zenn.dev/en2enzo2/articles/78d57ec01ed0c5}{【簡単】JupyterlabをDockerで起動}
+%   \2 \href{https://www.idnet.co.jp/column/page_187.html}{DockerでJupyterLabの環境を作ろう}
+% \end{myitemize}
+%
+% \iffalse
+%<*compose.yaml>
+% \fi
+% \begin{yamlcode}
+version: "3"
+
+services:
+  jupyterlab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jupyterlab
+    working_dir: /work
+    volumes:
+    - ${HOME}:/work
+    ports:
+    - "8888:8888"
+    environment:
+    - TZ=Asia/Tokyo
+    command:
+      jupyter-lab --ip 0.0.0.0 --allow-root -b localhost
+
+% \end{yamlcode}
+% \iffalse
+%</compose.yaml>
+% \fi
+% ^^A ]]] End of section `compose.yaml'.
+%
+% \section{\texttt{Dockerfile}}[updated=]^^A [[[
+% \begin{myitemize}
+% \0 Usage:
+% \1 \bashinline{docker build -t jupyterlab .}
+% \1 \bashinline{docker run -it --rm --name jupyterlab jupyterlab}
+% \0 References:
+% \1 \href{https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#apt-get}{apt-get}
+% \1 
+% \end{myitemize}
+%
+% \iffalse
+%<*Dockerfile>
+% \fi
+% \begin{dockercode}
+FROM python:3
+# ENV MISC=/home/yasutaka/Dropbox/configuration-files/miscellaneous/output-files/miscellaneous
+RUN apt-get update && apt-get install -y \
+    zsh
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
+% \end{dockercode}
+% \iffalse
+%</Dockerfile>
+% \fi
+% ^^A ]]] End of section `Dockerfile'.
+%
+% \section{\texttt{requirements.txt}}[updated=]^^A [[[
+% \iffalse
+%<*requirements.txt>
+% \fi
+% \begin{bashcode}
+jupyterlab
+jupyterlab-vim
+# lingam
+pandas
+pyyaml
+# torch
+# torchvision
+tqdm
+
+% \end{bashcode}
+% \iffalse
+%</requirements.txt>
+% \fi
+% ^^A ]]] End of section `requirements.txt'.
+%
+% ^^A ]]] End of part `Docker'.
+%
+% \endinput
+%
+% \part{config}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://www.ssh.com/academy/ssh/config}{SSH config file for OpenSSH client}
+% \1 Host
+%   \2 Restricts the following declarations to be only for those hosts that match one of the patterns given after the keyword.
+%   The pattern is matched against the host name given on the command line.
+% \1 HostName
+%   \2 Specifies the real host name to log into.
+%   This can be used to specify nicknames or abbreviations for hosts.
+%   The default is the name given on the command line.
+%   Numeric IP addresses are also permitted (both on the command line and in HostName specifications).
+% \1 IdentityFile
+%   \2 Specifies a file from which the user's identity key is read when using public key authentication.
+% \1 Compression
+%   \2 Specifies whether to use compression. yes enables compression.
+% \end{myitemize}
+%
+% \section{common}[updated=]^^A [[[
+% \iffalse
+%<*config.home|config.office>
+% \fi
+%
+% \subsection{github.com}[updated=]^^A [[[
+% \begin{bashcode}
+Host github.com
+    HostName github.com
+    User git
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/github-kitahara-neut
+    Compression yes
+
+% \end{bashcode}
+% ^^A ]]] End of subsection `github.com'.
+%
+% \iffalse
+%</config.home|config.office>
+% \fi
+% ^^A ]]] End of section `common'.
+%
+% \section{home}[updated=]^^A [[[
+% \iffalse
+%<*config.home>
+% \fi
+%
+% \subsection{bitbucket}[updated=]^^A [[[
+% \begin{bashcode}
+
+% \end{bashcode}
+% ^^A ]]] End of subsection `bitbucket'.
+%
+% \iffalse
+%</config.home>
+% \fi
+% ^^A ]]] End of section `common'.
+%
+% ^^A ]]] End of part `config'.
+%
+% \part{\texttt{utilities.js}}^^A [[[
+% \iffalse
+%<*utilities.js>
+% \fi
+%
+% \section{table}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://www.w3schools.com/howto/howto_js_filter_table.asp}{How TO - Filter/Search Table}
+% \1 \javascriptinline{style.display}
+%   \2 \href{https://magazine.techacademy.jp/magazine/33333}{JavaScriptのstyle.displayプロパティの使い方を現役エンジニアが解説【初心者向け】}
+% \end{myitemize}
+%
+% \begin{javascriptcode}
+function myFilter() {
+  // Declare variables
+  var checkbox, filter, table, tables, tr, td, i, txtValue;
+  checkbox = document.getElementById("showAll");
+  // filter = input.value.toUpperCase();
+  tables = document.getElementsByTagName("table");
+
+  for (table of tables) {
+    // table = document.getElementByClassName("dataframe");
+    tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[1];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (checkbox.checked == false && txtValue == "completed") {
+          tr[i].style.display = "none";
+        } else {
+          tr[i].style.display = "";
+        }
+      }
+    }
+  }
+}
+
+function mySearch() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("table-to-do list");
+  // table = document.getElementByClassName("dataframe");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+% \end{javascriptcode}
+% ^^A ]]] End of section `table'.
+%
+% \section{sidebar}^^A [[[
+% \begin{javascriptcode}
+function openSidebar() {
+ document.getElementsByTagName("main")[0].style.marginLeft = "25%";
+ document.getElementById("mySidebar").style.width = "25%";
+ document.getElementById("mySidebar").style.display = "block";
+ document.getElementById("openNav").style.display = 'none';
+}
+
+function closeSidebar() {
+ document.getElementsByTagName("main")[0].style.marginLeft = "0%";
+ document.getElementById("mySidebar").style.display = "none";
+ document.getElementById("openNav").style.display = "inline-block";
+}
+
+% \end{javascriptcode}
+% ^^A ]]] End of section `sidebar'.
+%
+% \iffalse
+%</utilities.js>
+% \fi
+% ^^A ]]] End of part `utilities.js'.
+%
+% \part{\texttt{mystyle.css}}^^A [[[
+% \iffalse
+%<*mystyle.css>
+% \fi
+%
+% \section{Notes}^^A [[[
+% \begin{myitemize}
+% \1 \cssinline{display}
+%   \2 \href{https://saruwakakun.com/html-css/basic/display}{【CSS】displayの使い方を総まとめ！inlineやblockの違いは？}
+% \1 \cssinline{box-shadow}
+%  \2 \href{https://saruwakakun.com/html-css/basic/box-shadow}{【CSS】box-shadowで影をつける方法とサンプル集}
+% \1 \cssinline{overflow}
+%   \2 overflowとはCSSのプロパティの１つで「要素のボックスからはみ出た部分をどう扱うか」を指定します。
+%   \urlref{https://saruwakakun.com/html-css/basic/overflow}{【CSS】overflowの使い方：hiddenやscrollの違いは？}
+% \1 \cssinline{text-transform}
+%   \2 text-transformとはテキストにおける英数字の大文字、小文字の表示を指定するプロパティです。
+%   \urlref{https://html-coding.co.jp/annex/dictionary/css/text-transform/}{text-transform}
+% \1 \cssinline{transition}
+%   \2 transition効果（時間的変化）をまとめて指定する
+%   \urlref{http://www.htmq.com/css3/transition.shtml}{transition－CSS3リファレンス}
+% \end{myitemize}
+% ^^A ]]] End of section `Notes'.
+%
+% \section{header}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://www.w3schools.com/howto/howto_css_fixed_menu.asp}{How TO - Fixed Menu}
+% \end{myitemize}
+%
+% \begin{csscode}
+header {
+  overflow: hidden;
+  background-color: black;
+  position: fixed; /* Set the navbar to fixed position */
+  top: 0; /* Position the navbar at the top of the page */
+  left: 0;
+  width: 100%; /* Full width */
+}
+/* Links inside the navbar */
+header button {
+  background-color: black;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+/* Change background on mouse-over */
+header button:hover {
+  background: #ddd;
+  color: black;
+}
+
+header time {
+  background: black;
+  color: white;
+  text-align: right;
+}
+% \end{csscode}
+% ^^A ]]] End of section `header'.
+%
+% \section{main}^^A [[[
+% \begin{csscode}
+main {
+%  margin-top: 50px; /* Add a top margin to avoid content overlay */
+%  top: 50px; /* Position the navbar at the top of the page */
+  padding: 10px;
+  padding-top: 80px;
+  transition: 0.5s;
+  font-family: sans-serif;
+  font-size: 20px;
+}
+
+h1 {
+  text-transform: capitalize;
+}
+
+% \end{csscode}
+% ^^A ]]] End of section `main'.
+%
+% \section{sidebar}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://www.w3schools.com/w3css/tryit.asp?filename=tryw3css_sidebar_accordion}{Sidebar Accordion}
+% \1 \href{https://www.w3schools.com/w3css/4/w3.css}{w3.css}
+% \end{myitemize}
+%
+% \begin{csscode}
+.sidebar {
+  transition: 0.5s;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: black;
+  position: fixed!important;
+  z-index: 1;
+  overflow: auto;
+  box-shadow: 2px 2px 4px gray;
+}
+
+.sidebar button {
+  display: block;
+  font-size: 29px;
+  background-color: blue;
+  color: white;
+  transition: 0.5s;
+}
+
+.sidebar a {
+  display: block;
+  font-size: 25px;
+  background-color: black;
+  color: white;
+  transition: 0.5s;
+}
+
+.sidebar a:hover {
+  display: block;
+  font-size: 35px;
+  background-color: white;
+  color: black;
+  transition: 1.0s;
+}
+
+% \end{csscode}
+% ^^A ]]] End of section `sidebar'.
+%
+% \section{table}^^A [[[
+% \begin{pythoncode}
+table {
+%    text-transform: capitalize;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 20px;
+    font-family: sans-serif;
+    min-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+thead tr {
+    background-color: #009879;
+    color: #ffffff;
+    text-align: left;
+}
+th, td {
+    padding: 12px 15px;
+}
+tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+tbody tr.active-row {
+    font-weight: bold;
+    color: #009879;
+}
+
+tr:hover {background-color: #d9efff;}
+
+tr:hover td {background-color: #d9efff;}
+
+% \end{pythoncode}
+% ^^A ]]] End of section `table'.
+%
+% \iffalse
+%</mystyle.css>
+% \fi
+% ^^A ]]] End of part `mystyle.css'.
+%
+% \part{autostart}[updated=2022-01-09T09:13:10]^^A [[[
+%
+% \begin{concealableitemize}^^A [[[
+% \1 The origin of `autostart'
+%   \2 \verb|~/.config/autostart/|
+%   \concealablemarginalnote{Updated: 2022-01-03T20:17:31}
+% \end{concealableitemize}^^A ]]]
+%
+% \section{Notes}[updated=2022-01-09T09:08:15]^^A [[[
+% \begin{myitemize}
+% \1 In your home directory, there's a folder called \verb|.config/autostart|.
+% Anything placed in this folder will be run when you login
+% \urlref{https://askubuntu.com/questions/178567/how-to-add-a-program-as-a-startup-application-from-a-terminal}{How to add a program as a startup application from a terminal?}
+% \1 \href{https://askubuntu.com/questions/598195/how-to-add-a-script-to-startup-applications-from-the-command-line}{How to add a script to Startup Applications from the command line? [duplicate]}
+% \1 Filename
+%   \2 Use hyphens, not underscores, to separate words
+%     \3 \verb|/usr/share/applications/google-chrome.desktop|, \verb|/usr/share/applications/setup-mozc.desktop|, etc.
+% \1 Syntax
+%   \2 \href{https://wiki.archlinux.org/title/desktop_entries#Application_entry}{Application entry}
+% \end{myitemize}
+% ^^A ]]] End of section `Notes'.
+%
+% \section{Implemantation}[updated=2022-01-09T09:10:27]^^A [[[
+%
+% \subsection{\texttt{analog-clock.desktop}}[updated=2022-01-09T09:09:33]^^A [[[
+%
+% \iffalse
+%<*analog-clock.desktop>
+% \fi
+%
+% \begin{inicode}
+% [Desktop Entry]
+% Type=Application
+% Exec=python3 /home/yasutaka/Dropbox/configuration-files/miscellaneous/output-files/python/analog_clock.py
+% \end{inicode}
+%
+% \iffalse
+%</analog-clock.desktop>
+% \fi
+%
+% ^^A ]]] End of subsection `analog-clock.desktop'.
+%
+% \subsection{\texttt{gnome-terminal.desktop}}[updated=2021-12-19T14:42:45]^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{--geometry=...}
+%   \2 windowサイズの指定
+% \end{myitemize}
+%
+% \iffalse
+%<*gnome-terminal.desktop>
+% \fi
+%
+% \begin{inicode}
+[Desktop Entry]
+Type=Application
+Exec=gnome-terminal --geometry=135x68+0
+% \end{inicode}
+%
+% \iffalse
+%</gnome-terminal.desktop>
+% \fi
+%
+% ^^A ]]] End of subsection `gnome-terminal.desktop'.
+%
+% \subsection{\texttt{google-chrome.desktop}}[updated=2021-12-19T14:36:16]^^A [[[
+%
+% \iffalse
+%<*google-chrome.desktop>
+% \fi
+%
+% \begin{inicode}
+[Desktop Entry]
+Type=Application
+Exec=google-chrome
+% \end{inicode}
+%
+% \iffalse
+%</google-chrome.desktop>
+% \fi
+%
+% ^^A ]]] End of subsection `google-chrome.desktop'.
+%
+% ^^A ]]] End of section `Implemantation'.
+%
+% ^^A ]]] End of part `autostart'.
+%
+% \part{\texttt{bookmarks}}[updated=2022-01-09T09:13:19]^^A [[[
+%
+% \section{Notes}[updated=2022-01-03T20:27:04]^^A [[[
+% \begin{myitemize}
+% \1 The origin of `GNOME Files'
+%   \2 \href{https://wiki.archlinux.org/title/GNOME/Files}{GNOME/Files}
+% \1 \verb|Ctrl+D| add to sidebar
+% \urlref{https://askubuntu.com/questions/83118/create-a-link-to-a-folder-on-the-left-panel-of-nautilus-file-manager}{Create a link to a folder on the left panel of Nautilus file manager?}
+% \1 Remove folders from the places sidebar
+% \urlref{https://wiki.archlinux.org/index.php/GNOME/Files#Remove_folders_from_the_places_sidebar}{Remove folders from the places sidebar}
+% \end{myitemize}
+% ^^A ]]] End of section `Notes'.
+%
+% \section{Implemantation}[updated=2022-01-09T09:12:52]^^A [[[
+%
+% \subsection{Writing common directories}[updated=2022-01-09T09:12:02]^^A [[[
+%
+% \iffalse
+%<*bookmarks.home|bookmarks.office>
+% \fi
+%
+% \begin{bashcode}
+file:///home/yasutaka/Dropbox/configuration-files configuration-files
+file:///home/yasutaka/Dropbox/my-documents-pdf my-documents-pdf
+% \end{bashcode}
+%
+% \iffalse
+%</bookmarks.home|bookmarks.office>
+% \fi
+%
+% ^^A ]]] End of subsection `Writing common directories'.
+%
+% \subsection{Writing \texttt{bookmarks.home}}[updated=2021-12-18T20:39:54]^^A [[[
+%
+% \iffalse
+%<*bookmarks.home>
+% \fi
+%
+% \begin{bashcode}
+file:///home/yasutaka/my-documents/computer computer
+file:///home/yasutaka/my-documents/english english
+file:///home/yasutaka/my-documents/job job
+file:///home/yasutaka/my-documents/math math
+file:///home/yasutaka/my-documents/miscellaneous miscellaneous
+file:///home/yasutaka/my-documents/physics physics
+% \end{bashcode}
+%
+% \iffalse
+%</bookmarks.home>
+% \fi
+%
+% ^^A ]]] End of subsection `Writing bookmarks.home'.
+%
+% \subsection{Writing \texttt{bookmarks.office}}[updated=2021-12-18T20:41:09]^^A [[[
+%
+% \iffalse
+%<*bookmarks.office>
+% \fi
+%
+% \begin{bashcode}
+file:///mnt/hgfs/job job
+% \end{bashcode}
+%
+% \iffalse
+%</bookmarks.office>
+% \fi
+%
+% ^^A ]]] End of subsection `Writing bookmarks.office'.
+%
+% ^^A ]]] End of section `Implemantation'.
+%
+% ^^A ]]] End of part `bookmarks'.
+%
+% \part{Git}^^A [[[
+%
+% \section{Notes}^^A [[[
+% \begin{myitemize}
+% \1 About \verb|.gitconfig|
+%   \2 Git's configuration files are all simple text files in the style of \verb|.ini| files.
+%   They record various choices and settings used by many Git commands
+%   \mycite[page=28]{version-control-with-git}.
+%   \2 \verb|~/.gitconfig|
+%   User-specific configuration settings manipulated with the \verb|--global| option
+%   \mycite[page=28]{version-control-with-git}.
+%   \2 \verb|~/.gitconfig| or \verb|~/.config/git/config| file:
+%   Values specific personally to you, the user.
+%   You can make Git read and write to this file specifically by passing the \verb|--global| option,
+%   and this affects \emph{all} of the repositories you work with on your system
+%   \urlref{https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup}{1.6 Getting Started - First-Time Git Setup}.
+% \1 About \verb|.gitignore|
+%   \2 You can also create a global \verb|.gitignore| file,
+%   which is a list of rules for ignoring files in \myemph{every} Git repository on your computer.
+%   For example, you might create the file at \verb|~/.gitignore_global| and add some rules to it
+%   \urlref{https://help.github.com/en/github/using-git/ignoring-files#create-a-global-gitignore}{Create a global .gitignore}.
+%   \2 \verb|.gitignore_global|とは，
+%   Gitで管理する全てのフォルダに適用される\verb|.gitignore|のようなファイルです．
+%   このファイルを作成して，常に無視したいファイルを追記することでGitの管理下から除外できます%
+%   \urlref{https://qiita.com/pira/items/dd67077c5b414c8eb59d#gitignore_global%E3%81%A8%E3%81%AF}{gitignoreglobalを作成する on OSX}．
+% \1
+% \end{myitemize}
+% ^^A ]]] End of section `Notes'.
+%
+% \section{Implementation}^^A [[[
+%
+% \subsection{\texttt{.gitconfig}}^^A [[[
+%
+% \subsubsection{user}[updated=2022-01-04T10:41:28]^^A [[[
+% \begin{myitemize}
+% \1 \href{https://stackoverflow.com/questions/14754762/can-gitconfig-options-be-set-conditionally}{Can gitconfig options be set conditionally?}にあるような
+% \iniinline{email = "if ..."}や\iniinline{email = "!if ..."}では機能しなかった
+% \end{myitemize}
+%
+% \begin{inicode}
+%<*.gitconfig.home>
+[user]
+    name = Yasutaka Kitahara @ home
+    email = 0fh4922388417x@gmail.com
+%</.gitconfig.home>
+%<*.gitconfig.office>
+[user]
+    name = Yasutaka Kitahara @ office
+    email = kitahara.yasutaka@neut.co.jp
+%</.gitconfig.office>
+% \end{inicode}
+% ^^A ]]] End of subsubsection `user'.
+%
+% \iffalse
+%<*.gitconfig.home|.gitconfig.office>
+% \fi
+%
+% \subsubsection{alias}^^A [[[
+% \begin{myitemize}
+% \1 References
+%   \2 \href{https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases}{2.7 Git Basics - Git Aliases}
+% \end{myitemize}
+%
+% \begin{inicode}
+[alias]
+    br = branch
+    ci = commit
+    co = checkout
+    st = status
+% \end{inicode}
+% ^^A ]]] End of subsubsection `alias'.
+%
+% \subsubsection{color}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://unix.stackexchange.com/questions/44266/how-to-colorize-output-of-git}{How to colorize output of git?}
+% \end{myitemize}
+%
+% \begin{inicode}
+[color "status"]
+    added = cyan
+    changed = green bold
+    untracked = red bold
+% \end{inicode}
+% ^^A ]]] End of subsubsection `color'.
+%
+% \subsubsection{commit}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://gist.github.com/lisawolderiksen/a7b99d94c92c6671181611be1641c733#template-file}{Using Git Commit Message Templates to Write Better Commit Messages}
+% \end{myitemize}
+%
+% \begin{inicode}
+[commit]
+    template = ~/Dropbox/config-files/misc/output-files/misc/.gitmessage
+% \end{inicode}
+% ^^A ]]] End of subsubsection `commit'.
+%
+% \subsubsection{core}^^A [[[
+% \begin{myitemize}
+% \1 \verb|$ git config --global core.excludesfile ~/.gitignore_global|
+%   \2 \href{https://git-scm.com/docs/gitignore#_description#:~:text=Patterns%20which%20a%20user%20wants%20Git%20to%20ignore%20in%20all%20situations}{Git - gitignore Documentation}
+%   \2 \href{https://help.github.com/en/github/using-git/ignoring-files#create-a-global-gitignore0}{参照先}
+% \1 \verb|$ git config --global core.editor nvim| (cf. "Pro Git")
+% \1
+% \end{myitemize}
+%
+% \begin{inicode}
+[core]
+    excludesfile = ~/Dropbox/config-files/misc/output-files/misc/.gitignore
+    editor = nvim
+% \end{inicode}
+% ^^A ]]] End of subsubsection `core'.
+%
+% \iffalse
+%</.gitconfig.home|.gitconfig.office>
+% \fi
+%
+% ^^A ]]] End of subsection `.gitconfig'.
+%
+% \subsection{\texttt{.gitignore}}[updated=2022-01-09T09:35:38]^^A [[[
+% \begin{myitemize}
+% \1 \verb|.gitignore|ファイルの書き方は\mycite[page=60]{version-control-with-git}
+% \1 各拡張子のメモ
+%   \2 \verb|.bib|: \LaTeX 参考文献ファイル
+%   \2 \verb|.csv|: Comma-separated values file (CSV)
+%   \2 \verb|.html|: HTML file
+%   \2 \verb|.jpg|: image file
+%   \2 \verb|.log|: log file
+%   \2 \verb|.pdf|: Portable Document Format (PDF)
+%   \2 \verb|.png|: image file
+%   \2 \verb|.pyc|: This is the compiled bytecode.
+%   If you import a module, python will build a \verb|*.pyc| file that contains the bytecode
+%   to make importing it again later easier (and faster).
+%   \urlref{https://stackoverflow.com/questions/8822335/what-do-the-python-file-extensions-pyc-pyd-pyo-stand-for}{What do the python file extensions, .pyc .pyd .pyo stand for?}
+%   \2 \verb|.zip|: 圧縮ファイル
+%   \2 \verb|.ipynb_checkpoints|: jupyter notebookで生成されるファイル
+%   \2 \verb|output-files|: mydocstrip.texで出力されるファイルの出力先
+% \end{myitemize}
+%
+% \iffalse
+%<*.gitignore>
+% \fi
+% \begin{bashcode}
+*.bib
+*.csv
+*.html
+*.jpg
+*.log
+*.pdf
+*.png
+*.pyc
+*.xlsx
+*.zip
+.ipynb_checkpoints
+output-files
+% \end{bashcode}
+% \iffalse
+%</.gitignore>
+% \fi
+% ^^A ]]] End of subsection `.gitignore'.
+%
+% \subsection{\texttt{.gitmessage}}[updated=]^^A [[[
+% \iffalse
+%<*.gitmessage>
+% \fi
+% \begin{bashcode}
+# ===========================
+# feat: Initialize Project
+#
+# * Add README.md
+# * Generate Rails scaffolding
+# * Add .gitignore
+# ===========================
+% \end{bashcode}
+% \iffalse
+%</.gitmessage>
+% \fi
+% ^^A ]]] End of subsection `.gitmessage'.
+%
+% ^^A ]]] End of section `Implementation'.
+%
+% ^^A ]]] End of part `Git'.
+%
+% ^^A End of file `miscellaneous.dtx'.

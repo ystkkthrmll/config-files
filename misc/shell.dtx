@@ -1,0 +1,2136 @@
+%
+% ^^A Configuring DocStrip [[[
+% \iffalse
+%<*driver>
+\input mydocstrip
+\mygenerate[output-files/shell]{
+  .bashrc,
+  configuredesktop.sh,
+  setwallpaper.sh,
+  symlinkconfigurationfiles.sh,
+  .zshrc,
+}
+\myrenamefile[output-files/shell]{configuredesktop.sh}{configure_desktop.sh}
+\myrenamefile[output-files/shell]{setwallpaper.sh}{set_wallpaper.sh}
+\myrenamefile[output-files/shell]{symlinkconfigurationfiles.sh}{symlink_configuration_files.sh}
+\myendbatchfile
+\mydriver[
+  show-notes,
+]
+%</driver>
+% \fi
+% ^^A ]]] End of Configuring DocStrip
+%
+% \mytitle{Shell関係}
+%
+% \begin{concealableitemize}^^A [[[
+% \1 The origin of `shell'
+%   \2 \href{https://google.github.io/styleguide/shellguide.html}{Shell Style Guide}
+%   \2 
+% \end{concealableitemize}^^A ]]]
+%
+% \begin{abstract}^^A [[[
+% Shell関係の設定
+% \begin{myitemize}
+% \1 \verb|configure_desktop.sh|
+%   \2 デスクトップ環境の設定ファイル
+%   \2 Usage: \bashinline{bash configure_desktop.sh}
+% \1 \verb|set_wallpaper.sh|
+% \1 \verb|symlink_configuration_files.sh|
+%   \2 Usage: \bashinline{bash symlink_configuration_files.sh}
+%   \2 symlink configuration files
+% \1 \verb|.bashrc|
+% \1 \verb|.zshrc|
+%   \2 Zsh configuration file
+% \end{myitemize}
+% \end{abstract}^^A ]]]
+%
+% \begin{mynote}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://en.wikipedia.org/wiki/Z_shell}{公式サイト}：\url{https://www.zsh.org/}
+% \1 \href{http://zsh.sourceforge.net/Doc/}{ZSH docmentation}
+% \1 \verb|evince|なら\verb|.pdf|のみ補完．のようにコマンドごとに補完する拡張子を指定したい
+% \1 \href{https://qiita.com/b4b4r07/items/f37aadef0b3f740e8c14}{もっと便利になれる zsh プラグインによる CLI ライフ}
+% \1 \href{https://qiita.com/mollifier/items/1220c0eeaa93e82f8afc}{zshの外部プラグインまとめ}
+% \1 terminalにおいてCapsLock keyでノーマルモードへ．
+% j, kで前に実行したコマンドを参照できる(恐らくzshでviで設定したから)
+% \1 
+% \1 \verb|configure_desktop.sh|
+%   \2 terminalの色をWhite on blackにする設定を追加したい
+%   \2 日時などのformatを英語にする設定を追加したい
+%   \2 terminalのfont設定を有効にする設定を追加したい
+%   \2 電源の設定を追加したい
+%   \2 DisplayのRefresh Rate, Scaleを設定できるようにしたい
+% \1 Makefileをdocstripで生成できないか？（タブ文字出力問題）
+%   \2 ダメなら\verb|Makefile|の内容を\verb|.sh|化して\verb|etc.dtx|から生成するようにする
+% \end{myitemize}
+% \end{mynote}^^A ]]]
+%
+% \begin{mywarning}[title=To-do list]^^A [[[
+% \begin{myitemize}
+% \1 GNU Stowでdotfilesが管理できるらしい．調べよ
+% \end{myitemize}
+% \end{mywarning}^^A ]]]
+%
+% \mytableofcontents
+%
+% \part{\texttt{configure\_desktop.sh}}^^A [[[
+%
+% \section{Notes}^^A [[[
+%
+% \begin{commandshell}gsettings list-recursively\end{commandshell}%
+% と実行すると設定一覧が表示される
+% （\href{http://fedorakenken.doorblog.jp/archives/51929536.html}{参照先}）．
+%
+% 実行結果から\verb|***|を含む行だけを表示したいときは，次のようにすればよい
+% （\href{https://www.atmarkit.co.jp/ait/articles/1604/07/news018.html}{参照先}）：
+% \begin{commandshell}gsettings list-recursively | grep ***\end{commandshell}
+%
+% \begin{mytip}^^A [[[
+% \begin{myitemize}
+% \1 設定の変更が保存されるファイル
+%   \2 \verb|~/.config/dconf/user|
+% \1
+% \1
+% \end{myitemize}
+% \end{mytip}^^A ]]]
+%
+% キーワード見つけ方：
+% \begin{myitemize}[enumerate]
+% \1 （必要に応じて）\bashinline{cd ~test/gnome}
+% \1 ~\bashinline{gsettings list-recursively > before.txt}
+% \1 設定を変更する．
+% \1 ~\bashinline{gsettings list-recursively > after.txt}
+% \1 ~\bashinline{vim -d before.txt after.txt}
+% \end{myitemize}
+%
+% \subsection{The origin of filename}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/desktop_migration_and_administration_guide/configuration-overview-gsettings-dconf}{CHAPTER 9. CONFIGURING DESKTOP WITH GSETTINGS AND DCONF}
+% \1 configure
+%   \2 to arrange something in a particular way, especially computer equipment;
+%   to make equipment or software work in the way that the user prefers
+%   \mycite[keyword=configure]{oxford-learners-dictionaries}% OK (2020-02-19T23:24:15)
+%   \2 to arrange something, especially computer equipment, so that it works with other equipment
+%   \mycite[keyword=configure]{longman}% OK (2020-02-19T23:25:58)
+%   \2 to arrange something or change the controls on a computer or other device
+%   so that it can be used in a particular way
+%   \mycite[keyword=configure]{cambridge-dictionary}% OK (2020-02-19T23:29:06)
+%   \2 環境設定する\mycite[keyword=configure]{weblio}% OK (2020-02-19T23:30:48)
+%   \2 コンフィギュレーションとは，設定，構成，配置，構造，形状，形態などの意味を持つ英単語．
+%   「コンフィグ」（config）はその省略形．
+%   \doublequotes{conf}あるいは\doublequotes{cfg}などの略号で表されることもある．
+%   コンピュータの分野では，機器やソフトウェアの動作や構成などについて利用者が指定・変更できる設定項目，
+%   環境設定という意味で用いられる．
+%   一定の形式で設定内容を記述したファイルとして保存・管理されることが多く，
+%   そのようなファイルを「コンフィギュレーションファイル」「コンフィグファイル」などという．
+%   類義語には\doublequotes{settings}（セッティング），\doublequotes{preferences}（プリファレンス）などがあり，
+%   厳密な意味の違いや使い分けはなく，ほぼ同義として用いられる．
+%   文脈によっては\doublequotes{options}（オプション），\doublequotes{properties}（プロパティ）なども
+%   同じような意味で用いられる\mycite[keyword=コンフィギュレーション]{e-words}．% OK (2020-02-19T23:37:46)
+% \1 desktop
+%   \2 a screen on a computer that shows the icons of programs and files that can be used
+%   \mycite[keyword=desktop]{oxford-learners-dictionaries}%  ()
+%   \2 デスクトップとは，机の上，作業面，卓上（の），などの意味を持つ英単語．
+%   グラフィックス表示（GUI）で操作するOSで，起動時に表示される，
+%   基本となる操作画面のことをデスクトップという\mycite[keyword=desktop]{e-words}．
+% \end{myitemize}
+% ^^A ]]] End of subsection `The origin of filename'.
+%
+% \subsection{Shebang}[updated=2022-01-28T22:18:09]^^A [[[
+% \begin{myitemize}
+% \1 シバンとは、LinuxなどのUNIX系OSで実行されるスクリプトファイルにおいて、
+% 先頭行でスクリプトを実行する処理系（インタプリタ）を指定する仕組み。
+% 「\verb|#!|」に続けて処理系の実行ファイルのパスを指定する。
+% \mycite[keyword=シバン]{e-words}
+% \1 \href{https://qiita.com/mohira/items/566ca75d704072bcb26f}{!/bin/sh は ただのコメントじゃないよ！ Shebangだよ！}
+% \1 \href{https://teratail.com/questions/264173}{シェバンについて（なぜ実行ファイルとして実行したいのか）}
+% \end{myitemize}
+%
+% \subsubsection{Test 1}[updated=2022-01-28T21:38:58]^^A [[[
+%
+% \iffalse
+%<*testshebang1.sh>
+% \fi
+%
+% \begin{bashcode}
+echo "Hello World!"
+% \end{bashcode}
+%
+% \iffalse
+%</testshebang1.sh>
+% \fi
+%
+% \bashinline{bash testshebang1.sh}
+% \myarrow \bashinline*{Hello World!}
+% ^^A ]]] End of subsubsection `Test 1'.
+%
+% \subsubsection{Test 2}[updated=2022-01-28T21:49:31]^^A [[[
+%
+% \iffalse
+%<*testshebang2.sh>
+% \fi
+%
+% \begin{bashcode}
+#!/bin/python3
+echo "Hello World!"
+% \end{bashcode}
+%
+% \iffalse
+%</testshebang2.sh>
+% \fi
+%
+% \bashinline{bash testshebang2.sh}
+% \myarrow \bashinline*{Hello World!}
+% ^^A ]]] End of subsubsection `Test 2'.
+%
+% \subsubsection{Test 3}[updated=2022-01-28T22:03:48]^^A [[[
+%
+% \iffalse
+%<*testshebang3.sh>
+% \fi
+%
+% \begin{bashcode}
+echo "Hello World!"
+% \end{bashcode}
+%
+% \iffalse
+%</testshebang3.sh>
+% \fi
+%
+% \bashinline{chmod +x testshebang3.sh && ./testshebang3.sh}
+% \myarrow \bashinline*{Hello World!}
+% ^^A ]]] End of subsubsection `Test 3'.
+%
+% \subsubsection{Test 4}[updated=2022-01-28T22:10:24]^^A [[[
+%
+% \iffalse
+%<*testshebang4.sh>
+% \fi
+%
+% \begin{bashcode}
+#!/bin/python3
+echo "Hello World!"
+% \end{bashcode}
+%
+% \iffalse
+%</testshebang4.sh>
+% \fi
+%
+% \bashinline{chmod +x testshebang4.sh && ./testshebang4.sh}
+% \myarrow Error
+% ^^A ]]] End of subsubsection `Test 4'.
+%
+% \subsubsection{Test 5}[updated=2022-01-28T22:13:25]^^A [[[
+%
+% \iffalse
+%<*testshebang5.sh>
+% \fi
+%
+% \begin{bashcode}
+#!/bin/python3
+print('Hello World!')
+% \end{bashcode}
+%
+% \iffalse
+%</testshebang5.sh>
+% \fi
+%
+% \bashinline{chmod +x testshebang5.sh && ./testshebang5.sh}
+% \myarrow \bashinline*{Hello World!}
+% ^^A ]]] End of subsubsection `Test 5'.
+%
+% \subsubsection{Conclusion}[updated=2022-01-28T22:17:50]^^A [[[
+% コマンドとして実行する場合のインタプリタを指定している．
+% ^^A ]]] End of subsubsection `Conclusion'.
+%
+% ^^A ]]] End of subsection `Shebang'.
+%
+% ^^A ]]] End of section `Notes'.
+%
+% \section{Implemantation}^^A [[[
+%
+% \iffalse
+%<*configuredesktop.sh>
+% \fi
+%
+% \subsection{Shebang}[updated=2022-01-29T15:58:52]^^A [[[
+% \begin{bashcode}
+#!/bin/bash
+% \end{bashcode}
+% ^^A ]]] End of subsection `Shebang'.
+%
+% \subsection{Defining variables}[updated=2021-12-19T15:00:09]^^A [[[
+% \begin{myitemize}
+% \1 \bashinline{uname}
+%   \2 uname - print system information \man{uname}
+% \1 \bashinline*{-n}
+%   \2 print the network node hostname \man{uname}
+% \1 \verb|extension|
+%   \2 \mycite[keyword=拡張子]{e-words}
+% \end{myitemize}
+%
+% \begin{bashcode}
+readonly COMPUTER_NAME=home
+if [[ $(uname -n) == ${COMPUTER_NAME} ]]; then
+  extension=home
+else
+  extension=office
+fi
+% \end{bashcode}
+% ^^A ]]] End of subsection `Defining variables'.
+%
+% \subsection{\texttt{org.gnome.desktop.background}}[updated=2022-01-09T10:34:44]^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{picture-uri}
+%   \2 URI to use for the background image.
+%   Note that the backend only supports local (file://) URIs.
+%   \bashinline{gsettings describe org.gnome.desktop.background picture-uri}
+% \end{myitemize}
+%
+% \begin{bashcode}
+filename="file:///home/yasutaka/Dropbox/configuration-files/miscellaneous/output-files/shell/wallpaper-${extension}.png"
+gsettings set org.gnome.desktop.background picture-uri ${filename}
+% \end{bashcode}
+% ^^A ]]] End of subsection `org.gnome.desktop.background'.
+%
+% \subsection{\texttt{org.gnome.desktop.interface}}[updated=2022-06-18T19:34:35]^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{clock-show-date}
+%   \2 If true, display date in the clock, in addition to time.
+%   \bashinline{gsettings describe org.gnome.desktop.interface clock-show-date}
+% \1 \bashinline*{clock-show-seconds}
+%   \2 If true, display seconds in the clock.
+%   \bashinline{gsettings describe org.gnome.desktop.interface clock-show-seconds}
+% \1 \bashinline*{clock-show-weekday}
+%   \2 If true, display weekday in the clock, in addition to time.
+%   \bashinline{gsettings describe org.gnome.desktop.interface clock-show-weekday}
+% \1 \bashinline*{color-scheme}
+%   \2 The preferred color scheme for the user interface.
+%   Valid values are “default”, “prefer-dark”, “prefer-light”.
+%   \bashinline{gsettings describe org.gnome.desktop.interface color-scheme}
+% \1 \bashinline*{gtk-theme}
+%   \2 Basename of the default theme used by gtk+.
+%   \bashinline{gsettings describe org.gnome.desktop.interface gtk-theme}
+% \end{myitemize}
+%
+% \begin{bashcode}
+gsettings set org.gnome.desktop.interface clock-show-date true
+gsettings set org.gnome.desktop.interface clock-show-seconds true
+gsettings set org.gnome.desktop.interface clock-show-weekday true
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-dark'
+% \end{bashcode}
+% ^^A ]]] End of subsection `org.gnome.desktop.interface'.
+%
+% \subsection{\texttt{org.gnome.desktop.session}}[updated=2022-01-04T00:26:48]^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{idle-delay}
+%   \2 The number of seconds of inactivity before the session is considered idle.
+%   \bashinline{gsettings describe org.gnome.desktop.session idle-delay}
+% \end{myitemize}
+%
+% \begin{bashcode}
+gsettings set org.gnome.desktop.session idle-delay 600
+% \end{bashcode}
+% ^^A ]]] End of subsection `org.gnome.desktop.session'.
+%
+% \subsection{\texttt{org.gnome.mutter}}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{experimental-features}
+%   \2 Fractional Scalingを有効にする設定
+% \end{myitemize}
+%
+% \begin{bashcode}
+gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer']"
+% \end{bashcode}
+% ^^A ]]] End of subsection `org.gnome.mutter'.
+%
+% \subsection{\texttt{org.gnome.nautilus.preferences}}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{default-folder-viewer}
+%   \2 icon or list
+% \end{myitemize}
+%
+% \begin{bashcode}
+gsettings set org.gnome.nautilus.preferences default-folder-viewer "'list-view'"
+% \end{bashcode}
+% ^^A ]]] End of subsection `org.gnome.nautilus.preferences'.
+%
+% \subsection{\texttt{org.gnome.settings-daemon.plugins.power}}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{sleep-inactive-ac-timeout}
+% \end{myitemize}
+%
+% \begin{bashcode}
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 1800
+% \end{bashcode}
+% ^^A ]]] End of subsection `org.gnome.settings-daemon.plugins.power'.
+%
+% \subsection{\texttt{org.gnome.shell}}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{favorite-apps}
+%   \2 The applications corresponding to these identifiers will be displayed in the favorites area.
+%   \bashinline{gsettings describe org.gnome.shell favorite-apps}
+% \end{myitemize}
+%
+% \RenewDocumentCommand \temporarycommand { m m } { \texttt{'#1'} & #2 \\ }
+% \begin{mytabular}{ll} \hline
+% \temporarycommand{entry???}{description???} \hline
+% \temporarycommand{org.gnome.Terminal.desktop}{Terminal}
+% \temporarycommand{org.gnome.Nautilus.desktop}{Files}
+% \temporarycommand{google-chrome.desktop}{Google Chrome}
+% \temporarycommand{rhythmbox.desktop}{Rhythmbox}
+% \temporarycommand{org.gnome.Screenshot.desktop}{Screenshot}
+% \temporarycommand{gnome-control-center.desktop}{Settings} \hline
+% \end{mytabular}
+%
+% \begin{bashcode}
+gsettings set org.gnome.shell favorite-apps \
+"[ \
+  'org.gnome.Terminal.desktop', \
+  'org.gnome.Nautilus.desktop', \
+  'google-chrome.desktop', \
+  'rhythmbox.desktop', \
+  'org.gnome.Screenshot.desktop', \
+  'gnome-control-center.desktop' \
+]"
+% \end{bashcode}
+% ^^A ]]] End of subsection `org.gnome.shell'.
+%
+% \subsection{\texttt{org.gnome.shell.extensions.dash-to-dock}}^^A [[[
+% \begin{myitemize}
+% \1 \doublequotes{Dash, Dock}って何？調べよ．
+% \1 \bashinline*{dash-max-icon-size}
+%   \2 icon size
+%   \2 \href{https://www.2daygeek.com/how-to-customize-the-gnome-3-desktop/}{参照先}
+% \1 \bashinline*{dock-fixed}
+%   \2 Auto hide dock
+% \1 \bashinline*{dock-position}
+%   \2 \href{https://askubuntu.com/questions/966927/how-do-i-move-ubuntu-dock-to-bottom-on-ubuntu-17-10-and-later/966935#966935}{参照先}
+% \1 \bashinline*{extend-height}
+%   \2 \href{https://gihyo.jp/admin/serial/01/ubuntu-recipe/0541}{参照先}
+% \1 \bashinline*{multi-monitor}
+%   \2 ???
+% \end{myitemize}
+%
+% \begin{bashcode}
+gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 16
+gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
+gsettings set org.gnome.shell.extensions.dash-to-dock dock-position BOTTOM
+gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
+gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor true
+gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts false
+% \end{bashcode}
+% ^^A ]]] End of subsection `org.gnome.shell.extensions.dash-to-dock'.
+%
+% \subsection{\texttt{org.gnome.shell.extensions.ding}}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{show-home}
+%   \2 
+% \end{myitemize}
+%
+% \begin{bashcode}
+gsettings set org.gnome.shell.extensions.ding show-home false
+% \end{bashcode}
+% ^^A ]]] End of subsection `org.gnome.shell.extensions.ding'.
+%
+% \subsection{\texttt{org.gnome.system.locale}}^^A [[[
+% \begin{myitemize}
+% \1 年月日などの表示形式．\textcolor{red}{上手くいかなかった}
+% \myarrow\ 再起動しても反映されなかった．
+% とりあえず手動で変更せよ．
+% \end{myitemize}
+%
+% \begin{bashcode}
+gsettings set org.gnome.system.locale region 'en_US.UTF-8'
+% \end{bashcode}
+% ^^A ]]] End of subsection `org.gnome.system.locale'.
+%
+% \subsection{\texttt{org.gnome.Terminal.Legacy.Keybindings}}^^A [[[
+%
+% \subsubsection{*** Shortcuts}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://unix.stackexchange.com/questions/297654/configuring-gnome-shell-key-bindings-from-the-command-line}{参照先}
+% \1 The origin of `\verb|schema|', `\verb|path|'
+%   \2 \bashinline*{gsettings set SCHEMA [:PATH] KEY VALUE} \man{gsettings}
+% \1
+% \end{myitemize}
+%
+% \begin{bashcode}
+schema=org.gnome.Terminal.Legacy.Keybindings
+path=/org/gnome/terminal/legacy/keybindings/
+gsettings set ${schema}:${path} close-tab '<Ctrl>w'
+gsettings set ${schema}:${path} close-window '<Ctrl>q'
+gsettings set ${schema}:${path} copy '<Ctrl>c'
+gsettings set ${schema}:${path} paste '<Ctrl>v'
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `***'.
+%
+% \subsubsection{Sound and Media}^^A [[[
+% \begin{myitemize}
+% \1 タイトルはSettings \myarrow\ Keyboard Shortcuts \myarrow\ Sound and Mediaより
+% \1 \verb|gsettings|で設定することができなかったので，\verb|dconf|を用いた
+% \urlref{https://tutorialmore.com/questions-83182.htm}{sound - Ubuntuは一部のメディアキーに対して正しいキーコードを提供しません}
+% \1 \verb|key|の由来は\verb|man dconf|の\verb|dconf write KEY VALUE|より
+% \end{myitemize}
+%
+% \begin{bashcode}
+key=/org/gnome/settings-daemon/plugins/media-keys
+dconf write ${key}/volume-up "['<Ctrl>Up']"
+dconf write ${key}/volume-down "['<Ctrl>Down']"
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Sound and Media'.
+%
+% \subsubsection{Custom Shortcuts}^^A [[[
+% \begin{myitemize}
+% \1 タイトルはSettings \myarrow\ Keyboard Shortcuts \myarrow\ Custom Shortcutsより．
+% \1 \href{https://askubuntu.com/questions/597395/how-to-set-custom-keyboard-shortcuts-from-terminal}{参照先}
+% \1 オーディオのスイッチ
+% \urlref{https://unix.stackexchange.com/questions/62818/how-can-i-switch-between-different-audio-output-hardware-using-the-shell}{How can I switch between different audio output hardware using the shell?}
+% \1 
+% \end{myitemize}
+%
+% \begin{bashcode}
+key=/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings
+% dconf write ${key}/custom0/name "'Switch diplay'"
+% dconf write ${key}/custom0/command "'pacmd set-card-profile 0 output:hdmi-stereo'"
+% dconf write ${key}/custom0/binding "'<Ctrl>Left'"
+%
+% dconf write ${key}/custom1/name "'Switch PC'"
+% dconf write ${key}/custom1/command "'pacmd set-card-profile 0 output:analog-stereo'"
+% dconf write ${key}/custom1/binding "'<Ctrl>Right'"
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Custom Shortcuts'.
+%
+% ^^A ]]] End of subsection `org.gnome.Terminal.Legacy.Keybindings'.
+%
+% \subsection{\texttt{org.gnome.Terminal.Legacy.Profile}}^^A [[[
+%
+% \subsubsection{Profile IDの取得}^^A [[[
+% \begin{myitemize}
+% \1 The origin of `profile id'
+%   \2 Terminal \myarrow\ Preferences \myarrow\ Profilesの内の一つを選択\myarrow
+%   Textタブ\myarrow\ 右下の文字列\doublequotes{Profile ID: ...}
+% \1 以下でProfile IDを取得
+%   \2 \href{https://zv-louis.hatenablog.com/entry/2018/05/28/120000}{参照先}
+% \end{myitemize}
+%
+% \begin{bashcode}
+temp1=$(gsettings get org.gnome.Terminal.ProfilesList list)
+temp2=${temp1:2}
+profile_id=${temp2:0:-2}
+% profile_id=$(dconf list /org/gnome/terminal/legacy/profiles:/)
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Profile IDの取得'.
+%
+% \subsubsection{Defining variables}^^A [[[
+% \begin{myitemize}[enumerate]
+% \1 font
+%   \2 \verb|"Ricty Diminished Bold 12"|
+%     \3 見やすいがVimで\verb|hi Foo cterm=bold|の意味がなくなるので\verb|Bold|をやめる
+%   \2 \verb|"Ricty Diminished 12"|
+%     \3 \verb|Bold|にしないと線が細くて見にくいのでやめる
+%   \2 \verb|"Ubuntu Mono 12"|
+% \end{myitemize}
+%
+% \begin{bashcode}
+schema=org.gnome.Terminal.Legacy.Profile
+path=/org/gnome/terminal/legacy/profiles
+%
+# myfont="Ricty Diminished Bold 12"
+# myfont="Ricty Diminished 12"
+myfont="Ubuntu Mono 12"
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Defining variables'.
+%
+% \subsubsection{Setting}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{font}
+%   \2 \href{https://zv-louis.hatenablog.com/entry/2018/05/28/120000}{参照先}
+%   \2 \href{https://www.netarium.jp/ubuntu-18-04-%E7%AB%AF%E6%9C%AB%E3%81%AE%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88%E3%81%AE%E8%A8%AD%E5%AE%9A/}{[Ubuntu 18.04] 端末のフォントの設定}
+%   \2 \verb|dconf write /org/gnome/terminal/legacy/profiles.../font "'Ricty ...'"|
+%   でもフォントは変更できる
+% \1 \bashinline*{default-size-columns}, \bashinline*{default-size-rows}
+%   \2 default window sizeの指定
+% \1 \bashinline*{audible-bell}
+%   \2 音が出ないようにするため
+% \end{myitemize}
+%
+% \begin{bashcode}
+gsettings set "${schema}:${path}:/:${profile_id}/" font "${myfont}"
+% key=/org/gnome/terminal/legacy/profiles
+% dconf write ${key}:/${profile_id}/font "'Ricty Diminished 12'"
+gsettings set "${schema}:${path}:/:${profile_id}/" default-size-columns "68"
+gsettings set "${schema}:${path}:/:${profile_id}/" default-size-rows "135"
+gsettings set "${schema}:${path}:/:$profile_id/" audible-bell false
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Setting'.
+%
+% ^^A ]]] End of subsection `org.gnome.Terminal.Legacy.Profile'.
+%
+% \subsection{Sound}^^A [[[
+% タイトルはSettings \myarrow\ Soundより．
+%
+% terminalから音量を変える方法
+% （\href{https://unix.stackexchange.com/questions/32206/set-volume-from-terminal}{参照先}）：
+% \verb|> amixer sset 'Master' 50%|
+%
+% ^^A ]]] End of subsection `Sound'.
+%
+% \iffalse
+%</configuredesktop.sh>
+% \fi
+%
+% ^^A ]]] End of section `Implemantation'.
+%
+% ^^A ]]] End of part `configure_desktop.sh'.
+%
+% \endinput
+%
+% \part{\texttt{set\_wallpaper.sh}}^^A [[[
+%
+% \begin{concealableitemize}^^A [[[
+% \1 The origin of `set wallpaper'
+%   \2 \href{https://linuxconfig.org/set-wallpaper-on-ubuntu-20-04-using-command-line}{Set wallpaper on Ubuntu 20.04 using command line}
+% \1 
+% \end{concealableitemize}^^A ]]]
+%
+% \section{Implemantation}^^A [[[
+% \begin{myitemize}
+% \1 wallpaperに設定するコマンドは以下を参照した：
+%   \2 \href{https://danilodellaquila.com/en/blog/how-to-automatically-change-your-desktop-background-wallpaper}{参照先}
+% \1
+% \end{myitemize}
+%
+% \iffalse
+%<*setwallpaper.sh>
+% \fi
+%
+% \subsection{Shebang}[updated=2022-01-29T15:59:20]^^A [[[
+% \begin{bashcode}
+#!/bin/bash
+% \end{bashcode}
+% ^^A ]]] End of subsection `Shebang'.
+%
+% \subsection{Defining variables}[updated=2021-12-19T22:05:14]^^A [[[
+% \begin{bashcode}
+readonly COMPUTER_NAME=home
+if [[ $(uname -n) == ${COMPUTER_NAME} ]]; then
+  extension=home
+else
+  extension=office
+fi
+% \end{bashcode}
+% ^^A ]]] End of subsection `Defining variables'.
+%
+% \subsection{Creating pdf file}^^A [[[
+% \begin{bashcode}
+latexmk ~/Dropbox/configuration-files/latex/output-files/miscellaneous/wallpaper-${extension}.tex
+% \end{bashcode}
+% ^^A ]]] End of subsection `Creating pdf file'.
+%
+% \subsection{Convert PDF to PNG}^^A [[[
+% \begin{myitemize}
+% \1 ~\bashinline{pdftoppm -png -r 500 input.pdf output}
+%   \2 \href{https://askubuntu.com/questions/50170/how-to-convert-pdf-to-image}{How to convert PDF to Image?}
+%   \2 \href{https://www.atmarkit.co.jp/ait/articles/1903/08/news039.html}
+%   {【 pdftoppm 】コマンド――PDFファイルを画像に変換する}
+%   \2 \href{https://unix.stackexchange.com/questions/11835/pdf-to-jpg-without-quality-loss-gscan2pdf}{pdf to jpg without quality loss; gscan2pdf}
+% \1 ~\bashinline{convert -density 300 file.pdf file.png}
+%   \2 デフォルトで使えなくなった？？？
+% \1 ファイル形式
+%   \2 jpgよりpngの方がきれいだった．たぶん解像度が高い？？？
+% \end{myitemize}
+%
+% \begin{mywarning}[title=エラー発生時の対処法]^^A [[[
+% \href{https://askubuntu.com/questions/1081695/error-during-converting-jpg-to-pdf}{参照先}
+% \begin{myitemize}[enumerate]
+% \1 ~\bashinline{vi /etc/ImageMagick-6/policy.xml}
+% \1 \textinline{pdf}の行にある\textinline{rights="none"}を\textinline{rights="read | write"}に変更
+% \end{myitemize}
+% \end{mywarning}^^A ]]]
+%
+% \begin{bashcode}
+pdftoppm -png -r 700 wallpaper-${extension}.pdf wallpaper-${extension}
+% \end{bashcode}
+% ^^A ]]] End of subsection `Convert PDF to PNG'.
+%
+% \subsection{rename, remove}^^A [[[
+% \begin{bashcode}
+mv wallpaper-${extension}-1.png wallpaper-${extension}.png
+rm wallpaper-${extension}.tex wallpaper-${extension}.pdf
+% \end{bashcode}
+% ^^A ]]] End of subsection `rename, remove'.
+%
+% \iffalse
+%</setwallpaper.sh>
+% \fi
+%
+% ^^A ]]] End of section `Implemantation'.
+%
+% ^^A ]]] End of part `set_wallpaper.sh'.
+%
+% \part{\texttt{symlink\_configuration\_files.sh}}^^A [[[
+%
+% \begin{concealableitemize}^^A [[[
+% \1 The origin of filename
+%   \2 symlink
+%     \3 \href{https://dotfiles.github.io/utilities/}{ここ}や\href{https://dotfiles.github.io/inspiration/}{ここ}で
+%     \doublequotes{link}で検索したら\doublequotes{symlink (your) dotfiles}とあったから．
+%   \2 dotfiles
+%     \3 \url{https://wiki.archlinux.org/index.php/Dotfiles}
+%   \2 \doublequotes{symlink dotfiles}の由来は，
+%   \href{https://dotfiles.github.io/}{ここ}で\doublequotes{link}で
+%   検索したら\doublequotes{symlink (your) dotfiles}とあったから．
+% \end{concealableitemize}^^A ]]]
+%
+% \section{Notes}^^A [[[
+% \begin{myitemize}
+% \1 既に\verb|~/.gitconfig|などのファイルが存在するとエラーになるが，
+% \verb|-f|オプションでそれを回避できる
+% \urlref{https://www.atmarkit.co.jp/ait/articles/1605/30/news022.html#opt}{【 ln 】コマンド――ファイルのハードリンクとシンボリックリンクを作る}．
+% \1 オプション\doublequotes{\myverb{-p}}はサブディレクトリを含んだディレクトリを一気に作成するため
+% \urlref{https://tech.nikkeibp.co.jp/it/article/COLUMN/20060227/230831/}{参照先}．
+% \1
+% \end{myitemize}
+% ^^A ]]] End of section `Notes'.
+%
+% \section{Implemantation}^^A [[[
+% \iffalse
+%<*symlinkconfigurationfiles.sh>
+% \fi
+%
+% \subsection{Shebang}[updated=2022-01-29T15:59:46]^^A [[[
+% \begin{bashcode}
+#!/bin/bash
+% \end{bashcode}
+% ^^A ]]] End of subsection `Shebang'.
+%
+% \subsection{Defining variables}[updated=2021-12-19T15:18:10]^^A [[[
+% \begin{bashcode}
+readonly COMPUTER_NAME=home
+if [[ $(uname -n) == ${COMPUTER_NAME} ]]; then
+  extension=home
+else
+  extension=office
+fi
+% \end{bashcode}
+% ^^A ]]] End of subsection `Defining variables'.
+%
+% \subsection{\LaTeX}^^A [[[
+%
+% \subsubsection{Defining variables}^^A [[[
+% \begin{myitemize}
+% \1 \myverb{\$TEXMFLOCAL}を取得
+% \begin{bashcode}
+% kpsewhich -expand-braces='$TEXMFLOCAL'
+% \end{bashcode}
+% で表示されるディレクトリに自分で追加したパッケージを置く
+% \mycite[page=10]{teach-yourself-latex2e}
+% \1
+% ^^A \bashinline|kpsewhich -expand-braces='$TEXMFLOCAL'|
+% ^^A \verb|kpsewhich -expand-braces='$TEXMFLOCAL'|
+% \1
+% \end{myitemize}
+%
+% \begin{bashcode}
+texmflocal=$(kpsewhich -expand-braces='$TEXMFLOCAL')
+configuration_latex=~/Dropbox/config-files/latex/output-files
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Defining variables'.
+%
+% \subsubsection{Directoryの作成}^^A [[[
+% \begin{myitemize}
+% \1 directory名が\verb|tex|でなければならない理由は
+% 恐らく\href{run:/usr/share/texlive/texmf-dist/web2c/texmf.cnf}{texmf.cnf}の149行目
+% \1 directory名が\verb|bibtex/bib|でなければならない理由は
+% 恐らく\href{run:/usr/share/texlive/texmf-dist/web2c/texmf.cnf}{texmf.cnf}の234,314行目．
+% \end{myitemize}
+%
+% \begin{bashcode}
+sudo mkdir -p ${texmflocal}/tex
+sudo mkdir -p ${texmflocal}/bibtex/bib
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Directoryの作成'.
+%
+% \subsubsection{Making symbolic links}^^A [[[
+% \begin{myitemize}
+% \1 The origin of `Making symbolic links'
+%   \2 \man{ln}
+% \1 既にファイルが存在するとエラーになるが，
+% \verb|-f|オプションでそれを回避できる
+% \urlref{https://www.atmarkit.co.jp/ait/articles/1605/30/news022.html#opt}{【 ln 】コマンド――ファイルのハードリンクとシンボリックリンクを作る}．
+% \end{myitemize}
+%
+% \begin{bashcode}
+sudo ln -f -s ${configuration_latex}/classes/mydocument.cls ${texmflocal}/tex/mydocument.cls
+sudo ln -f -s ${configuration_latex}/classes/mydtxfile.cls ${texmflocal}/tex/mydtxfile.cls
+sudo ln -f -s ${configuration_latex}/classes/myslides.cls ${texmflocal}/tex/myslides.cls
+sudo ln -f -s ${configuration_latex}/classes/mywallpaper.cls ${texmflocal}/tex/mywallpaper.cls
+sudo ln -f -s ${configuration_latex}/misc/mydocstrip.tex ${texmflocal}/tex/mydocstrip.tex
+% \end{bashcode}
+%
+% \begin{bashcode}
+sudo ln -f -s ${configuration_latex}/packages/myenglish.sty ${texmflocal}/tex/myenglish.sty
+sudo ln -f -s ${configuration_latex}/packages/mygraphic.sty ${texmflocal}/tex/mygraphic.sty
+sudo ln -f -s ${configuration_latex}/packages/mymath.sty ${texmflocal}/tex/mymath.sty
+sudo ln -f -s ${configuration_latex}/packages/myprogramming.sty ${texmflocal}/tex/myprogramming.sty
+% \end{bashcode}
+%
+% \begin{bashcode}
+sudo ln -f -s ${configuration_latex}/references/myreferences.bib ${texmflocal}/bibtex/bib/myreferences.bib
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Making symbolic links'.
+%
+% \subsubsection{Updating}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline{texhash}
+%   \2 \href{https://en.wikibooks.org/wiki/LaTeX/Installing_Extra_Packages}{Update your index}
+% \1
+% \end{myitemize}
+%
+% \begin{bashcode}
+sudo texhash
+% sudo mktexlsr
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Updating'.
+%
+% \subsubsection{\texttt{.latexmkrc}}[updated=2021-12-19T15:22:20]^^A [[[
+% \begin{bashcode}
+ln -f -s ${configuration_latex}/misc/.latexmkrc ~/.latexmkrc
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `.latexmkrc'.
+%
+% ^^A ]]] End of subsection `LaTeX'.
+%
+% \subsection{miscellaneous}[updated=2021-12-19T15:29:16]^^A [[[
+%
+% \subsubsection{Defining variables}[updated=2022-01-09T10:40:45]^^A [[[
+% \begin{bashcode}
+configuration_miscellaneous=~/Dropbox/config-files/misc/output-files
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Defining variables'.
+%
+% \subsubsection{Git}[updated=2021-12-19T15:23:14]^^A [[[
+% \begin{bashcode}
+ln -f -s ${configuration_miscellaneous}/misc/.gitconfig.${extension} ~/.gitconfig
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Git'.
+%
+% \subsubsection{Zsh}[updated=2021-12-19T15:23:42]^^A [[[
+% \begin{bashcode}
+ln -f -s ${configuration_miscellaneous}/shell/.zshrc ~/.zshrc
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Zsh'.
+%
+% \subsubsection{GNOME/Files bookmarks}[updated=2021-12-19T15:25:25]^^A [[[
+% \begin{bashcode}
+ln -f -s ${configuration_miscellaneous}/misc/bookmarks.${extension} ~/.config/gtk-3.0/bookmarks
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `GNOME/Files bookmarks'.
+%
+% \subsubsection{autostart}[updated=2021-12-19T15:28:15]^^A [[[
+% \begin{bashcode}
+autostart=~/.config/autostart
+ln -f -s ${configuration_miscellaneous}/misc/analog-clock.desktop ${autostart}/analog-clock.desktop
+ln -f -s ${configuration_miscellaneous}/misc/gnome-terminal.desktop ${autostart}/gnome-terminal.desktop
+ln -f -s ${configuration_miscellaneous}/misc/google-chrome.desktop ${autostart}/google-chrome.desktop
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `autostart'.
+%
+% \subsubsection{config}[updated=]^^A [[[
+% \begin{bashcode}
+ssh_config=~/.ssh
+ln -f -s ${configuration_miscellaneous}/misc/config.${extension} ${ssh_config}/config
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `config'.
+%
+% ^^A ]]] End of subsection `miscellaneous'.
+%
+% \subsection{pandoc}[updated=]^^A [[[
+%
+% \subsubsection{Defining variables}[updated=]^^A [[[
+% \begin{bashcode}
+src_pandoc=~/Dropbox/config-files/pandoc
+dest_pandoc=${HOME}/.local/share/pandoc
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Defining variables'.
+%
+% \subsubsection{Making directory}^^A [[[
+% \begin{bashcode}
+sudo mkdir -p ${dest_pandoc}/defaults
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Making directory'.
+%
+% \subsubsection{defaults}[updated=]^^A [[[
+% \begin{bashcode}
+ln -f -s ${src_pandoc}/defaults/common.yaml ${dest_pandoc}/defaults
+ln -f -s ${src_pandoc}/defaults/report-from-markdown-to-html.yaml ${dest_pandoc}/defaults
+ln -f -s ${src_pandoc}/defaults/report-from-markdown-to-latex.yaml ${dest_pandoc}/defaults
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `defaults'.
+%
+% ^^A ]]] End of subsection `pandoc'.
+%
+% \subsection{Python}[updated=]^^A [[[
+%
+% \subsubsection{Defining variables}[updated=]^^A [[[
+% \begin{bashcode}
+configuration_python=~/Dropbox/configuration-files/miscellaneous/output-files/python
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Defining variables'.
+%
+% \subsubsection{Modules}[updated=]^^A [[[
+% \begin{myitemize}
+% \1 配置するディレクトリの調べ方：
+%   \2 \pythoninline{import sys}
+%   \2 \pythoninline{print(sys.path)}
+% \1 References
+%   \2 \href{https://qiita.com/derodero24/items/6e2d809ceb6360211bd2}{【Python】自作モジュールへのパスの通し方}
+%   \2 \href{https://stackabuse.com/creating-and-importing-modules-in-python/}{Creating and Importing Modules in Python}
+% \end{myitemize}
+%
+% \begin{bashcode}
+ln -f -s ${configuration_python}/my_module.py ~/.local/lib/python3.10/site-packages/my_module.py
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Modules'.
+%
+% ^^A ]]] End of subsection `Python'.
+%
+% \subsection{Vim}[updated=2021-12-21T21:54:35]^^A [[[
+%
+% \subsubsection{Defining variables}[updated=2021-12-19T15:33:24]^^A [[[
+% \begin{bashcode}
+configuration_vim=~/Dropbox/config-files/vim/output-files
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Defining variables'.
+%
+% \subsubsection{\texttt{init.vim}}[updated=2021-12-19T15:35:17]^^A [[[
+% \begin{myitemize}
+% \1 The origin of `\verb|~/.config/nvim/init.vim|'
+%   \2 \vimhelp{vimrc-intro}
+% \end{myitemize}
+%
+% \begin{bashcode}
+mkdir -p ~/.config/nvim
+ln -f -s ${configuration_vim}/config-files/init.vim ~/.config/nvim/init.vim
+ln -f -s ${configuration_vim}/config-files/.NERDTreeBookmarks.${extension} ~/.NERDTreeBookmarks
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `init.vim'.
+%
+% \subsubsection{ftplugin}[updated=2021-12-19T15:37:58]^^A [[[
+% \begin{myitemize}
+% \1 The origin of `\verb|~/.config/nvim/after/ftplugin/***.vim|'
+%   \2 \vimhelp[section=3.]{ftplugin-overrule}
+% \end{myitemize}
+%
+% \begin{bashcode}
+ftplugin=~/.config/nvim/after/ftplugin
+mkdir -p ${ftplugin}
+ln -f -s ${configuration_vim}/ftplugin/css.vim ${ftplugin}
+ln -f -s ${configuration_vim}/ftplugin/dot.vim ${ftplugin}
+ln -f -s ${configuration_vim}/ftplugin/html.vim ${ftplugin}
+ln -f -s ${configuration_vim}/ftplugin/java.vim ${ftplugin}
+ln -f -s ${configuration_vim}/ftplugin/json.vim ${ftplugin}
+ln -f -s ${configuration_vim}/ftplugin/markdown.vim ${ftplugin}
+ln -f -s ${configuration_vim}/ftplugin/pu.vim ${ftplugin}
+ln -f -s ${configuration_vim}/ftplugin/python.vim ${ftplugin}
+ln -f -s ${configuration_vim}/ftplugin/tex.vim ${ftplugin}
+ln -f -s ${configuration_vim}/ftplugin/yaml.vim ${ftplugin}
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `ftplugin'.
+%
+% \subsubsection{Syntax files}[updated=2021-12-21T21:54:22]^^A [[[
+%
+% \begin{concealableitemize}^^A [[[
+% \1 The origin of `syntax file'
+%   \2 \vimhelp{mysyntaxfile-add}
+% \end{concealableitemize}^^A ]]]
+%
+% \begin{myitemize}
+% \1 The origin of `\verb|~/.config/nvim/after/syntax/***.vim|'
+%   \2 \vimhelp[section=2.]{mysyntaxfile-add}
+% \1 \verb|tex.vim|は必ず\verb|after|フォルダの下に置くこと．
+% 既存の\verb|TexNewMathZone|関数などが使用できなくなるため．
+% \end{myitemize}
+%
+% \begin{bashcode}
+syntax=~/.config/nvim/after/syntax
+mkdir -p ${syntax}
+ln -f -s ${configuration_vim}/syntax/dot.vim ${syntax}
+ln -f -s ${configuration_vim}/syntax/python.vim ${syntax}
+ln -f -s ${configuration_vim}/syntax/tex.vim ${syntax}
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Syntax files'.
+%
+% ^^A ]]] End of subsection `Vim'.
+%
+% \subsection{Visual Studio Code}[updated=]^^A [[[
+%
+% \subsubsection{Defining variables}[updated=]^^A [[[
+% \begin{bashcode}
+src_visual_studio_code=~/Dropbox/config-files/visual-studio-code/output-files
+dest_visual_studio_code=${HOME}/.config/Code/User
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Defining variables'.
+%
+% \subsubsection{settings}[updated=]^^A [[[
+% \begin{myitemize}
+% \0 \verb|keybindings.json|
+% \1 File location:
+%   \2 \href{https://bobbyhadz.com/blog/reset-keyboard-shortcuts-in-vscode}{How to Reset your Keyboard Shortcuts in Visual Studio Code}
+%     \3 Linux: \verb|$HOME/.config/Code/User/keybindings.json|
+%     \3 Windows: \verb|%UserProfile%\AppData\Roaming\Code\User\keybindings.json|
+% \end{myitemize}
+%
+% \begin{bashcode}
+ln -f -s ${src_visual_studio_code}/keybindings.json ${dest_visual_studio_code}
+ln -f -s ${src_visual_studio_code}/settings.json ${dest_visual_studio_code}
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `settings'.
+%
+% ^^A ]]] End of subsection `Visual Studio Code'.
+%
+% \iffalse
+%</symlinkconfigurationfiles.sh>
+% \fi
+% ^^A ]]] End of section `Implemantation'.
+%
+% ^^A ]]] End of part `symlink_configuration_files.sh'.
+%
+% \part{\texttt{.bashrc}, \texttt{.zshrc}}^^A [[[
+%
+% \iffalse
+%<*.bashrc>
+% \fi
+%
+% ^^A [[[
+%
+% \begin{myitemize}
+% \1 数値など間違いないこと確認済み
+% \concealablemarginalnote{Update: 2022-01-19T13:40:40}
+% \end{myitemize}
+%
+% \begin{bashcode}
+extract-evaluation-value() {
+  arg=$1
+  filename="${arg%.*}.csv"
+
+  echo "--------------"
+  echo "number of trained images"
+  echo "conf_thresh"
+  echo "precision"
+  echo "recall"
+  echo "F1-score"
+  echo "mAP"
+  echo "ap (id=0)"
+  echo "ap (id=1)"
+  echo "ap (id=2)"
+  echo "↓"
+
+  # number of trained images
+  temp=$(cat $1 | grep K-images | awk '{print $4}')
+  echo ${temp}
+  echo "number of trained images,${temp}" > ${filename}
+
+  # conf_thresh
+  temp=$(cat $1 | grep F1-score | awk '{print $4}' | sed -e "s/,//")
+  echo ${temp}
+  echo "conf_thresh,${temp}" >> ${filename}
+
+  # precision
+  temp=$(cat $1 | grep F1-score | awk '{print $7}' | sed -e "s/,//")
+  echo ${temp}
+  echo "precision,${temp}" >> ${filename}
+
+  # recall
+  temp=$(cat $1 | grep F1-score | awk '{print $10}' | sed -e "s/,//")
+  echo ${temp}
+  echo "recall,${temp}" >> ${filename}
+
+  # F1-score
+  temp=$(cat $1 | grep F1-score | awk '{print $13}')
+  echo ${temp}
+  echo "F1-score,${temp}" >> ${filename}
+
+  # mAP
+  temp=$(cat $1 | grep mAP@ | awk '{print $6}' | sed -e "s/,//")
+  echo ${temp}
+  echo "mAP,${temp}" >> ${filename}
+
+  # ap (id=0)
+  temp=$(cat $1 | grep green | awk '{print $9}' | sed -e "s/%//")
+  echo ${temp}
+  echo "ap (id=0),${temp}" >> ${filename}
+
+  # ap (id=1)
+  temp=$(cat $1 | grep yellow | awk '{print $9}' | sed -e "s/%//")
+  echo ${temp}
+  echo "ap (id=1),${temp}" >> ${filename}
+
+  # ap (id=2)
+  temp=$(cat $1 | grep red | awk '{print $9}' | sed -e "s/%//")
+  echo ${temp}
+  echo "ap (id=2),${temp}" >> ${filename}
+
+  echo "--------------"
+}
+% \end{bashcode}
+%
+%
+%
+%
+% \begin{bashcode}
+setxkbmap -option caps:swapescape
+
+HISTTIMEFORMAT='%Y-%m-%dT%T%z '
+HISTCONTROL=erasedups
+
+alias py='python3'
+alias psbash='ps x -u ykitahara | grep bash'
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+
+readonly AIDEA=/raid/work/aisea/train/ykitahara
+readonly ATSUTA=/raid/work/kitahara/002-atsuta-health-center---ai
+readonly JAMSTEC=/raid/work/kitahara/jamstec/classification/work
+
+alias cdltap="cd /mnt/c/Users/kitahara.yasutaka/Desktop/long-term_anomaly_prediction"
+
+alias cdkitahara="cd /raid/work/kitahara"
+
+alias cdaidea="cd ${AIDEA}"
+alias cdout="cd /raid/work/aisea/data/videos_images_for_outsourcing"
+alias cdjamstec="cd ${JAMSTEC}"
+
+alias cdatsuta="cd ${ATSUTA}"
+
+prepare-for-darknet() {
+  mkdir $1
+  cd $1
+  mkdir -p data
+  mkdir -p output-files/evaluate
+  mkdir -p output-files/test/images
+  mkdir -p output-files/test/videos
+  mkdir -p output-files/train
+  cp ../../0-data/templates/command.sh .
+  cp ../../0-data/templates/docker-compose.yml .
+  cp ../../0-data/templates/.env .
+  cp -r ../../0-data/templates/labels data
+  tree
+}
+% \end{bashcode}
+%
+%
+% ^^A ]]]
+%
+% \iffalse
+%</.bashrc>
+% \fi
+%
+% \iffalse
+%<*.zshrc>
+% \fi
+%
+% \section{Default}^^A [[[
+% 初回zsh起動時に***を選択すると設定されるコード．これを少し変更した．
+%
+% \begin{bashcode}
+# Set up the prompt
+setopt histignorealldups sharehistory
+
+# Use vi keybindings（-vに変更）
+bindkey -v
+
+# Keep 10000 lines of history within the shell and save it to ~/.zsh_history:（10000に変更）
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.zsh_history
+
+# Use modern completion system
+autoload -Uz compinit
+compinit
+
+zstyle ':completion:*' auto-description 'specify: %d'
+zstyle ':completion:*' completer _expand _complete _correct _approximate
+zstyle ':completion:*' format 'Completing %d'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' menu select=2
+eval "$(dircolors -b)"
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
+zstyle ':completion:*' menu select=long
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+zstyle ':completion:*' use-compctl false
+zstyle ':completion:*' verbose true
+
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+% \end{bashcode}
+% ^^A ]]] End of section `Default'.
+%
+% \section{PROMPT}^^A [[[
+% \urlref{https://original-game.com/terminal-zsh2/}{.zshrc で zsh をカスタマイズしてみよう。（プラグイン無し）}
+%
+% \urlref{https://qiita.com/ktr_type23/items/3eb782f98c7a5f4c60b0#%E4%BD%BF%E3%81%84%E3%81%9D%E3%81%86%E3%81%AA%E3%83%91%E3%83%A9%E3%83%A1%E3%82%BF}{とりあえずZshを使えば良いんだろう？}
+%
+% \urlref{http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html}{zshの出力}
+%
+% \subsection{Delimiter???}^^A [[[
+% \begin{myitemize}
+% \1 \urlref{https://stackoverflow.com/questions/32443522/triangular-background-for-bash-ps1-prompt}{三角形を出力する方法}
+% \1 \verb|$ sudo apt install fonts-powerline|
+% \end{myitemize}
+%
+% \begin{bashcode}
+TEMP=$'\ue0b0'
+% \end{bashcode}
+% ^^A ]]] End of subsection `title考え中'.
+%
+% \subsection{Defining colors}^^A [[[
+% \begin{bashcode}
+first_color=green
+second_color=blue
+third_color=yellow
+fourth_color=cyan
+% \end{bashcode}
+% ^^A ]]] End of subsection `Defining colors'.
+%
+% \subsection{Defining \texttt{get\_git\_branch\_name()}}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://medium.com/pareture/simplest-zsh-prompt-configs-for-git-branch-name-3d01602a6f33}{Simplest ZSH Prompt Configs for Git Branch Name}
+% \end{myitemize}
+%
+% \begin{bashcode}
+function get_git_branch_name() {
+  branch=$(git symbolic-ref HEAD 2> /dev/null | awk 'BEGIN{FS="/"} {print $NF}')
+  if [[ ${branch} == "" ]];
+  then
+    :
+  else
+    echo '('${branch}')'
+  fi
+}
+% \end{bashcode}
+% ^^A ]]] End of subsection `Defining get_git_branch_name'.
+%
+% \subsection{Defining PROMPT}^^A [[[
+% \begin{myitemize}
+% \1 \verb|%D|: The date in yy-mm-dd format \urlref{http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html}{13.2.4 Date and time}.
+% \1 \verb|%W|: The date in mm/dd/yy format \urlref{http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html}{13.2.4 Date and time}.
+% \1 \verb|%*|: Current time of day in 24-hour format, with seconds \urlref{http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html}{13.2.4 Date and time}.
+% \1 
+% \end{myitemize}
+%
+% \begin{bashcode}
+setopt prompt_subst
+%<<PROMPT
+PROMPT=%K{$first_color}%F{black}' '%D' '\
+%k%f%K{$second_color}%F{$first_color}$TEMP' '\
+%k%f%K{$second_color}%F{black}%*' '\
+%k%f%K{$third_color}%F{$second_color}$TEMP' '\
+%k%f%K{$third_color}%F{black}%~' '\
+%k%f%K{$fourth_color}%F{$third_color}$TEMP' '\
+%k%f%K{$fourth_color}%F{black}'$(get_git_branch_name) '\
+%k%f%K{black}%F{$fourth_color}$TEMP' '%k%f
+%PROMPT
+% \end{bashcode}
+% ^^A ]]] End of subsection `Defining PROMPT'.
+%
+% ^^A ]]] End of section `PROMPT'.
+%
+% \section{setopt}^^A [[[
+%
+% \subsection{auto\_cd}^^A [[[
+% If a command is issued that can't be executed as a normal command,
+% and the command is the name of a directory, perform the \texttt{cd} command to that directory.
+% This option is only applicable if the option \texttt{SHIN\_STDIN} is set,
+% i.e. if commands are being read from standard input.
+% The option is designed for interactive use;
+% it is recommended that \texttt{cd} be used explicitly in scripts to avoid ambiguity
+% \urlref{http://zsh.sourceforge.net/Doc/Release/Options.html#Changing-Directories}{16.2.1 Changing Directories}.
+%
+% \begin{bashcode}
+setopt auto_cd
+% \end{bashcode}
+% ^^A ]]] End of subsection `auto_cd'.
+%
+% \subsection{correct}^^A [[[
+% コマンドのスペルミスを修正（cf. \url{http://qiita.com/uasi/items/c4288dd835a65eb9d709}）．
+% \begin{bashcode}
+setopt correct
+% \end{bashcode}
+% ^^A ]]] End of subsection `correct'.
+%
+% \subsection{***}^^A [[[
+% cdの後にlsを自動で実行（cf. \url{http://qiita.com/uasi/items/c4288dd835a65eb9d709}）．
+%
+% \begin{bashcode}
+chpwd() {ls --color=auto}
+% \end{bashcode}
+% ^^A ]]] End of subsection `***'.
+%
+% 補完の候補から除外するファイルの拡張子を指定（cf. \url{https://teratail.com/questions/25280}）．
+% \begin{bashcode}
+# zstyle ':completion:*:*files' ignored-patterns '*.pdf'
+# zstyle ':completion:*:*files' ignored-patterns '*.bib' '*.cls' '*.ins' '*.pdf' '*.sty' '*.xlsx'
+% \end{bashcode}
+%
+% cdした先のディレクトリをディレクトリスタックに追加する．
+% ディレクトリスタックとは今までに行ったディレクトリの履歴のこと．
+% `cd +<Tab>` でディレクトリの履歴が表示され、そこに移動できる．
+% \begin{bashcode}
+setopt auto_pushd
+% \end{bashcode}
+%
+% pushd したとき、ディレクトリがすでにスタックに含まれていればスタックに追加しない
+%    \begin{macrocode}
+setopt pushd_ignore_dups
+%    \end{macrocode}
+%
+% 入力したコマンドがすでにコマンド履歴に含まれる場合、履歴から古いほうのコマンドを削除する
+% コマンド履歴とは今まで入力したコマンドの一覧のことで、上下キーでたどれる
+%    \begin{macrocode}
+setopt hist_ignore_all_dups
+%    \end{macrocode}
+%
+% <Tab> でパス名の補完候補を表示したあと、
+% 続けて <Tab> を押すと候補からパス名を選択できるようになる
+% 候補を選ぶには <Tab> か Ctrl-N,B,F,P
+%
+% \begin{bashcode}
+zstyle ':completion:*:default' menu select=1
+% \end{bashcode}
+%
+%
+%
+% ^^A ]]] End of section `setopt'.
+%
+% \section{hash}^^A [[[
+% \begin{myitemize}
+% \1 \doublequotes{hash}とは＊＊＊．
+% \1 例えば，\bashinline{cd ~dotfiles}または\bashinline{~dotfiles}で移動可能．
+% \1 ハッシュ名（正式名称は？）はよほどの事情がない限り変更してはいけない．
+% したがって，ハッシュ名は慎重に決めよ．
+% \1 配列で処理したいところだが，bash/zshには2多次元配列が用意されていない
+% \href{https://stackoverflow.com/questions/12317483/array-of-arrays-in-bash/35728122}{参照先}
+% \1 注意：名前と\verb|=|の間にタブやスペースを入れるとエラー
+% \1 注意：\verb|=|との間にタブやスペースを入れるとエラー
+% \end{myitemize}
+%
+% \subsection{Dropbox}[updated=]^^A [[[
+% \begin{bashcode}
+hash -d dropbox=~/Dropbox
+
+hash -d config-files=~dropbox/config-files
+hash -d config-latex=~config-files/latex
+hash -d config-misc=~config-files/misc
+hash -d config-pandoc=~config-files/pandoc
+hash -d config-vim=~config-files/vim
+hash -d config-vscode=~config-files/visual-studio-code
+
+hash -d notes=~dropbox/notes
+
+hash -d my-documents-pdf=~dropbox/my-documents-pdf
+% \end{bashcode}
+% ^^A ]]] End of subsection `Dropbox'.
+%
+% \subsection{temoporary???}^^A [[[
+% 以下は一時的なもの．
+%    \begin{macrocode}
+hash -d test=~/test
+
+%    \end{macrocode}
+% ^^A ]]] End of subsection `temoporary'.
+%
+% \begin{bashcode}
+readonly COMPUTER_NAME=home
+if [[ $(uname -n) == ${COMPUTER_NAME} ]]; then
+% \end{bashcode}
+%
+% \subsection{computer}^^A [[[
+% \begin{bashcode}
+hash -d computer-science=~/my-documents/computer/computer-science/subfiles
+% \end{bashcode}
+%
+% \subsubsection{data-science}^^A [[[
+% \begin{bashcode}
+hash -d data-science=~/my-documents/computer/data-science
+hash -d causal-discovery=~data-science/causal-discovery
+hash -d deep-learning=~data-science/deep-learning
+hash -d image-classification=~data-science/image-classification
+hash -d image-segmentation=~data-science/image-segmentation
+hash -d natural-language-processing=~deep-learning/natural-language-processing/subfiles
+hash -d objedt-detection=~data-science/objedt-detection
+hash -d reinforcement-learning=~deep-learning/reinforcement-learning/subfiles
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `data-science'.
+%
+% \subsubsection{operating-systems}^^A [[[
+% \begin{bashcode}
+hash -d linux=~/my-documents/computer/operating-systems/linux
+hash -d env-setup=~linux/env-setup/subfiles
+hash -d windows=~/my-documents/computer/operating-systems/windows/subfiles
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `operating-systems'.
+%
+% \subsubsection{programming-languages}^^A [[[
+% \begin{bashcode}
+hash -d programming-languages=~/my-documents/computer/programming-languages
+hash -d java=~programming-languages/java/subfiles
+hash -d latex=~programming-languages/latex/subfiles
+hash -d markdown=~programming-languages/markdown/subfiles
+hash -d python=~programming-languages/python
+hash -d shells=~programming-languages/shells
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `programming-languages'.
+%
+% \subsubsection{software}^^A [[[
+% \begin{bashcode}
+hash -d software=~/my-documents/computer/software
+hash -d aws=~software/aws
+hash -d database=~software/database
+hash -d text-editor=~software/text-editor
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `software'.
+%
+% ^^A ]]] End of subsection `computer'.
+%
+% \subsection{english}^^A [[[
+% \begin{bashcode}
+hash -d expressions=~/my-documents/english/expressions
+hash -d grammar=~/my-documents/english/grammar/subfiles
+hash -d vocabulary=~/my-documents/english/vocabulary
+% \end{bashcode}
+% ^^A ]]] End of subsection `english'.
+%
+% \subsection{job}^^A [[[
+% \begin{bashcode}
+hash -d job=~/my-documents/job
+hash -d job-change=~/my-documents/job/job-change/subfiles
+hash -d job-etc=~/my-documents/job/etc
+hash -d job-general-theory=~/my-documents/job/general-theory/subfiles
+hash -d job-current-company=~/my-documents/job/current-company/subfiles
+% \end{bashcode}
+% ^^A ]]] End of subsection `job'.
+%
+% \subsection{math}^^A [[[
+% \begin{bashcode}
+hash -d math=~/my-documents/math/subfiles
+
+hash -d algebra=~math/algebra
+hash -d linear-algebra=~math/algebra/linear-algebra
+
+hash -d set-theory=~math/foundations/set-theory
+
+
+hash -d real-analysis=~/my-documents/math/subfiles/analysis/real-analysis
+hash -d differentiation=~math/analysis/real-analysis/differentiation
+hash -d integration=~math/analysis/real-analysis/integration
+
+hash -d statistics=~math/probability-and-statistics/statistics
+# hash -d probability-theory=~math/probability-and-statistics/probability-theory
+% \end{bashcode}
+% ^^A ]]] End of subsection `math'.
+%
+% \subsection{misc}^^A [[[
+% \begin{bashcode}
+hash -d misc=~/my-documents/misc
+hash -d car=~misc/car/subfiles
+hash -d qiita=~misc/qiita
+hash -d rules=~misc/rules/subfiles
+hash -d shopping=~misc/shopping/subfiles
+% \end{bashcode}
+% ^^A ]]] End of subsection `misc'.
+%
+% \subsection{physics}^^A [[[
+% \begin{bashcode}
+hash -d physics=~/my-documents/physics
+hash -d classical-mechanics=~/my-documents/physics/classical-mechanics/subfiles
+hash -d electromagnetism=~/my-documents/physics/electromagnetism/subfiles
+hash -d relativity=~/my-documents/physics/theory-of-relativity/subfiles
+hash -d quantum-mechanics=~/my-documents/physics/quantum-mechanics/subfiles
+hash -d electromagnetism=~/my-documents/physics/electromagnetism/subfiles
+% \end{bashcode}
+% ^^A ]]] End of subsection `physics'.
+%
+% \begin{bashcode}
+else
+% \end{bashcode}
+%
+% \subsection{job at office only}^^A [[[
+% \begin{bashcode}
+hash -d windows=/mnt/c/Users/kitahara.yasutaka/projects-on-windows
+hash -d dgx-home=dgx:/home/ykitahara
+hash -d dgx-aidea=dgx:/raid/work/aisea/train/ykitahara
+hash -d dgx-atsuta=dgx:/raid/work/kitahara/002-atsuta-health-center---ai
+hash -d misc=~/projects/999-miscellaneous
+
+# Avoid Python shap module error
+# https://github.com/NVlabs/instant-ngp/discussions/300
+export QT_QPA_PLATFORM=offscreen
+% \end{bashcode}
+% ^^A ]]] End of subsection `job at office only'.
+%
+% \begin{bashcode}
+fi
+% \end{bashcode}
+%
+% \subsection{Projects}^^A [[[
+% \begin{bashcode}
+hash -d projects=~/projects
+hash -d common=~/projects/000-common-items
+hash -d nagoya-cu=~/projects/002-nagoya-city-university---head-ai
+hash -d subaru=~/projects/003-subaru---anomaly-detection
+hash -d jdc-kaggle=~/projects/004-jdc-kaggle---data-analysis
+hash -d neutral=~/projects/005-neutral---ntech-predict
+hash -d jonan=~/projects/006-jonan-denki---data-analysis
+hash -d tiis=~/projects/007-tiis---palletizing
+hash -d kioxia=~/projects/008-kioxia---anomaly-detection
+hash -d yamaha=~/projects/009-yamaha---speaker-optimization
+hash -d aidea=~/projects/010-aidea---converting-programming-language
+hash -d jamstec=~/projects/011-jamstec---material-recognition
+hash -d scsk=~/projects/012-scsk---omniverse
+hash -d tmc=~/projects/013-tmc---data-science
+hash -d smart-scape=~/projects/014-smart-scape---data-science
+
+% \end{bashcode}
+% ^^A ]]] End of subsection `Projects'.
+%
+% ^^A ]]] End of section `hash'.
+%
+% \subsection{alias}^^A [[[
+%
+% \subsubsection{Suffix Alias}^^A [[[
+% ^^ASyntax\mycite[url=https://blog.lftechnology.com/command-line-productivity-with-zsh-aliases-28b7cebfdff9]{Command Line Productivity with ZSH Aliases}
+%
+% \href{https://blog.lftechnology.com/command-line-productivity-with-zsh-aliases-28b7cebfdff9}{Syntax}
+%
+% \verb|alias -s [file-extension]=[name-of-app]|
+%
+% \href{https://news.mynavi.jp/article/zsh-16/}{参照先}
+% \begin{bashcode}
+alias -s dtx=vim
+alias -s pdf=evince
+alias -s py=vim
+alias -s tex=vim
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `Suffix Alias'.
+%
+% \subsection{cd}^^A [[[
+% \begin{bashcode}
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+% \end{bashcode}
+% ^^A ]]] End of subsection `cd'.
+%
+% \subsection{evince}^^A [[[
+%    \begin{macrocode}
+alias ev='evince'
+%    \end{macrocode}
+% ^^A ]]] End of subsection `evince'.
+%
+% \subsubsection{ls/la}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline{ls [-a]}の結果を色付け
+% \end{myitemize}
+%
+% \begin{bashcode}
+alias ls='ls --color'
+alias la='ls -a --color'
+% \end{bashcode}
+% ^^A ]]] End of subsubsection `ls/la'.
+%
+% \subsection{nvim}^^A [[[
+% vim, viでnvimを起動
+% \begin{bashcode}
+alias vim='nvim'
+alias vi='nvim'
+% \end{bashcode}
+% ^^A ]]] End of subsection `vim'.
+%
+% \subsection{python}^^A [[[
+% \begin{bashcode}
+alias py='python3'
+alias python='python3'
+% \end{bashcode}
+% ^^A ]]] End of subsection `python'.
+%
+% \subsection{tree}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://www.cyberciti.biz/faq/how-to-show-recursive-directory-listing-on-linux-or-unix/}{How to show recursive directory listing on Linux or Unix}
+%   \2 \bashinline{tree}で表示できる．ただし，標準でinstallされていない
+% \1 \href{https://stackoverflow.com/questions/3455625/linux-command-to-print-directory-structure-in-the-form-of-a-tree}{Linux command to print directory structure in the form of a tree}
+% \1 
+% \end{myitemize}
+%
+% \begin{bashcode}
+alias tree="ls -aR | grep ':$' | perl -pe 's/:$//;s/[^-][^\/]*\//    /g;s/^    (\S)/└── \1/;s/(^    |    (?= ))/│   /g;s/    (\S)/└── \1/'"
+alias treefile='find . | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"'
+% \end{bashcode}
+% ^^A ]]] End of subsection `***'.
+%
+% \subsection{***}^^A [[[
+%
+%    \begin{macrocode}
+# luajitlatexのaliasの設定
+alias luajitlatex='luajittex --fmt=luajitlatex.fmt'
+
+alias lua='/usr/bin/lua5.3'
+
+# alias ruff='python3 ~/.local/lib/python3.10/site-packages/ruff/__main__.py'
+export PATH="$HOME/.local/bin:$PATH"
+%    \end{macrocode}
+% ^^A ]]] End of subsection `***'.
+%
+% ^^A ]]] End of subsection `alias'.
+%
+% \section{Functions}^^A [[[
+% \begin{myitemize}
+% \1 \href{http://zsh.sourceforge.net/Guide/zshguide03.html#l49}{関数の書き方}
+% \1 \href{https://qiita.com/walrein/items/b6dd650381f978b4dbc8}{参照先}
+% \1 \href{https://shellscript.sunone.me/function.html#%E9%96%A2%E6%95%B0%E3%81%AE%E5%BC%95%E6%95%B0}{関数の引数}
+% \end{myitemize}
+%
+% \subsection{man}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline{man}で表示されるtextのカラー化
+% \urlref{https://qiita.com/aosho235/items/0f2b73d08eb645c05208#man%E3%81%AE%E3%82%AB%E3%83%A9%E3%83%BC%E5%8C%96}{manの読み方（初心者向け）}
+% \1
+% \end{myitemize}
+%
+% \begin{bashcode}
+man() {
+    env LESS_TERMCAP_mb=$'\E[01;31m' \
+    LESS_TERMCAP_md=$'\E[01;38;5;74m' \
+    LESS_TERMCAP_me=$'\E[0m' \
+    LESS_TERMCAP_se=$'\E[0m' \
+    LESS_TERMCAP_so=$'\E[38;5;246m' \
+    LESS_TERMCAP_ue=$'\E[0m' \
+    LESS_TERMCAP_us=$'\E[04;38;5;146m' \
+    man "$@"
+}
+% \end{bashcode}
+% ^^A ]]] End of subsection `man'.
+%
+% \subsection{mkdir}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline*{mkdir}フォルダ作成後，そのディレクトリに\verb|cd|する
+% \1 \href{https://superuser.com/questions/152794/is-there-a-shortcut-to-mkdir-foo-and-immediately-cd-into-it}{ここ}
+% を参照した
+% \end{myitemize}
+%
+% \begin{bashcode}
+% mkdir() {
+%   mkdir $1 ; cd $_
+%   mkdir $1 && cd $_
+%   # mkdir $1 &&
+%   # cd $_
+% }
+% \end{bashcode}
+% ^^A ]]] End of subsection `mkdir'.
+%
+% \subsection{lc}^^A [[[
+% \begin{myitemize}
+% \1 \bashinline{latexmk}した後に\bashinline{cp ***.pdf ~/Dropbox/my-documents-pdf/***.pdf}するコマンド
+% \1 \verb|lc|の由来は\bashinline{latexmk}と\bashinline{cp}の頭文字を合わせた
+% \1 As of mid-2019, Dropbox no longer follows items outside of your Dropbox account
+% that are linked to by a symlink
+% \urlref{https://help.dropbox.com/installs-integrations/sync-uploads/symlinks}{How to use symlinks with Dropbox}.
+% \end{myitemize}
+%
+% \begin{bashcode}
+lc() {
+  latexmk $1
+  cp *.pdf ~my-documents-pdf/$2
+}
+% \end{bashcode}
+% ^^A ]]] End of subsection `lc'.
+%
+% \subsection{notes}[updated=2021-12-19T15:56:04]^^A [[[
+% \begin{bashcode}
+notes() {
+  # cd ~/Dropbox/
+  # evince notes.pdf &
+  vi ~/Dropbox/notes.md
+}
+% \end{bashcode}
+% ^^A ]]] End of subsection `notes'.
+%
+% \subsection{docstrip}^^A [[[
+% \begin{bashcode}
+docstrip() {
+    # -h, --helpしたら呼ぶ
+    help() {
+        echo 'Usage: docstrip [option] filename output_filename1 output_filename2 ...'
+        echo "filename doesn't include extension"
+        return
+    }
+
+    for arg in $*
+    do
+        case $arg in
+            -h|--help)
+                help
+                return
+                ;;
+            *)
+        esac
+    done
+    python3 ~/Dropbox/config-files/latex/output-files/etc/docstrip.py $1 $2
+    return 1;
+}
+% \end{bashcode}
+% ^^A ]]] End of subsection `docstrip'.
+%
+% \subsection{config-latex}^^A [[[
+% \begin{myitemize}
+% \1 \url{https://qiita.com/petitviolet/items/b1e8b5139169dd530919}
+% \1 The origin of `\verb|-pv|'
+%   \2 latexmkだけど本当に\verb|-pv|でいいの？
+% \1
+% \end{myitemize}
+%
+% \begin{bashcode}
+config-latex() {
+    # -h, --helpしたら呼ぶ
+    help() {
+        echo 'Usage: config-latex [option] filename'
+        return
+    }
+
+    for arg in $*
+    do
+        case $arg in
+            -h|--help)
+                help
+                return
+                ;;
+            -pv|--preview)
+                evince ~config-latex/$*[$#].pdf &
+                ;;
+            *)
+        esac
+    done
+    cd ~config-latex
+    vi ~config-latex/$*[$#].dtx
+    return 1;
+}
+%
+# https://blog.freedom-man.com/zsh-completions
+_config-latex() {
+    _values '' 'classes' 'miscellaneous' 'notes' 'packages'
+}
+%
+compdef _config-latex config-latex
+% \end{bashcode}
+% ^^A ]]] End of subsection `config-latex'.
+%
+% \subsection{config-misc}^^A [[[
+% \begin{bashcode}
+config-misc() {
+    # -h, --helpしたら呼ぶ
+    help() {
+        echo 'Usage: config-misc [option] filename'
+        return
+    }
+
+    for arg in $*
+    do
+        case $arg in
+            -h|--help)
+                help
+                return
+                ;;
+            -pv|--preview)
+                evince ~configuration-etc/$*[$#].pdf &
+                ;;
+            *)
+        esac
+    done
+    cd ~config-misc
+    vi ~config-misc/$*[$#].dtx
+    return 1;
+}
+
+# https://blog.freedom-man.com/zsh-completions
+_config-misc() {
+    _values '' 'miscellaneous' 'python' 'shell' 'visual-studio-code'
+}
+
+compdef _config-misc config-misc
+% \end{bashcode}
+% ^^A ]]] End of subsection `config-misc'.
+%
+% \subsection{config-vim}^^A [[[
+% \begin{bashcode}
+config-vim() {
+    # -h, --helpしたら呼ぶ
+    help() {
+        echo 'Usage: config-vim [option] filename'
+        return
+    }
+
+    for arg in $*
+    do
+        case $arg in
+            -h|--help)
+                help
+                return
+                ;;
+            -pv|--preview)
+                evince ~config-vim/$*[$#].pdf &
+                ;;
+            *)
+        esac
+    done
+    cd ~config-vim
+    vi ~config-vim/$*[$#].dtx
+    return 1;
+}
+%
+# https://blog.freedom-man.com/zsh-completions
+_config-vim() {
+    _values '' 'configuration-files' 'ftplugin' 'snippets' 'syntax'
+}
+%
+compdef _config-vim config-vim
+% \end{bashcode}
+% ^^A ]]] End of subsection `config-vim'.
+%
+% \subsection{config-pandoc}^^A [[[
+% \begin{bashcode}
+config-pandoc() {
+  # -h, --helpしたら呼ぶ
+  help() {
+    echo 'Usage: config-pandoc [option] filename'
+    return
+  }
+
+  for arg in $*
+  do
+    case $arg in
+      -h|--help)
+        help
+        return
+        ;;
+      -pv|--preview)
+        evince ~config-vim/$*[$#].pdf &
+        ;;
+        *)
+      esac
+    done
+    cd ~config-pandoc
+    vi ~config-pandoc/$*[$#]
+    return 1;
+}
+%
+_config-pandoc() {
+    _values '' 'report.yaml'
+}
+%
+compdef _config-pandoc config-pandoc
+% \end{bashcode}
+% ^^A ]]] End of subsection `config-pandoc'.
+%
+% \subsection{english}^^A [[[
+%    \begin{macrocode}
+function grammar (){
+	cd ~/my-documents/english/grammar/
+	evince grammar.pdf &
+	vi grammar.tex
+}
+%
+function vocabulary (){
+	cd ~/my-documents/english/vocabulary/
+	evince vocabulary.pdf &
+	vi vocabulary.tex
+}
+%
+
+
+%    \end{macrocode}
+% ^^A ]]] End of subsection `english'.
+%
+% \subsection{etc.}^^A [[[
+% `ve'=`Vim and Evince'
+%
+% \begin{bashcode}
+ve() {
+    # -h, --helpしたら呼ぶ
+    help() {
+        echo 'Usage: ve [option] filename'
+        return
+    }
+    evince $*[$#].pdf &
+    vi $*[$#].tex
+}
+
+% https://qiita.com/ocian/items/f465283d97207cd0e4ef
+% 以下試しで書いた
+% _ve(){
+% local cur=${COMP_WORDS[COMP_WORD]}
+% COMPREPLY=( $(compgen -W "(ls *.tex)" -- $cur) )
+% }
+% compdef _ve ve
+
+% \end{bashcode}
+% ^^A ]]] End of subsection `etc.'.
+%
+% \subsection{bgm()}^^A [[[
+% \begin{bashcode}
+bgm() {
+  # -h, --helpしたら呼ぶ
+  help() {
+    echo 'Usage: bgm [-h/--help] [-a/--all] [-e/--edit]'
+    return
+  }
+
+  local bgm_py=~/Dropbox/configuration-files/miscellaneous/output-files/python/bgm.py
+
+  readonly COMPUTER_NAME=home
+  if [[ $(uname -n) == ${COMPUTER_NAME} ]]; then
+    bgm_data=~/my-documents/misc/misc/bgm.yaml
+  else
+    # bgm_data=
+  fi
+
+  for arg in $*; do
+    case $arg in
+      -h|--help)
+        help
+        return
+        ;;
+      -a|--all)
+        python3 ${bgm_py} -a
+        return
+        ;;
+      -e|--edit)
+        vi ${bgm_data}
+        return
+        ;;
+      *)
+        python3 ${bgm_py}
+        return
+        ;;
+    esac
+  done
+
+  python3 ${bgm_py}
+  return 1;
+}
+%
+_show() {
+    _values '' 'bgm'
+}
+%
+compdef _show show
+% \end{bashcode}
+% ^^A ]]] End of subsection `bgm()'.
+%
+% \subsection{convert-yaml-to-html()}^^A [[[
+% \begin{bashcode}
+convert-yaml-to-html() {
+  # -h, --helpしたら呼ぶ
+  help() {
+    echo 'Usage: convert-yaml-to-html [-h/--help] [-a/--all] [-e/--edit] yaml-file'
+    return
+  }
+
+  local convert_yaml_to_html_py=~/Dropbox/configuration-files/miscellaneous/output-files/python/convert_yaml_to_html.py
+
+  for arg in $*; do
+    case $arg in
+      -h|--help)
+        help
+        return
+        ;;
+      -e|--edit)
+        vi $1
+        return
+        ;;
+      *)
+        python3 ${convert_yaml_to_html_py} $1
+        google-chrome *.html &
+        return
+        ;;
+    esac
+  done
+
+  python3 ${convert_yaml_to_html_py} $1
+  google-chrome *.html &
+  return 1;
+}
+%
+_convert-yaml-to-html() {
+    _values '' '/home/yasutaka/my-documents/math/subfiles/miscellaneous/notes.yaml' '/home/yasutaka/my-documents/english/expressions/expressions.yaml' '/home/yasutaka/my-documents/miscellaneous/miscellaneous/bookmarks.yaml'
+}
+%
+compdef _convert-yaml-to-html convert-yaml-to-html
+% \end{bashcode}
+% ^^A ]]] End of subsection `convert-yaml-to-html()'.
+%
+% \subsection{references}^^A [[[
+% \begin{bashcode}
+references() {
+  help() {
+    echo 'Usage: references [-h/--help] [-a/--all] [-e/--edit]'
+    return
+  }
+
+  local references_py=~/Dropbox/configuration-files/miscellaneous/output-files/python/references.py
+  local references_yaml=~/Dropbox/configuration-files/latex/references.yaml
+
+  for arg in $*; do
+    case $arg in
+      -h|--help)
+        help
+        return
+        ;;
+      -a|--all)
+        python3 ${references_py} -a
+        return
+        ;;
+      -e|--edit)
+        vi ${references_yaml}
+        return
+        ;;
+      *)
+        python3 ${references_py}
+        return
+        ;;
+    esac
+  done
+
+  python3 ${references_py}
+  return 1;
+}
+% \end{bashcode}
+% ^^A ]]] End of subsection `references'.
+%
+% \subsection{to-do-list()}^^A [[[
+% \begin{bashcode}
+to-do-list() {
+  # -h, --helpしたら呼ぶ
+  help() {
+    echo 'Usage: to-do-list [-h/--help] [-a/--all] [-e/--edit] [-s/--show]'
+    return
+  }
+
+  local to_do_list_py=~/Dropbox/configuration-files/miscellaneous/output-files/python/to_do_list.py
+
+  readonly COMPUTER_NAME=home
+  if [[ $(uname -n) == ${COMPUTER_NAME} ]]; then
+    to_do_list_data=~/Dropbox/notes/data/to-do-list-home.yaml
+    to_do_list_html=~/Dropbox/to-do-list-home.html
+  else
+    to_do_list_data=~/projects/999-miscellaneous/data/to-do-list.yaml
+    to_do_list_html=~/Dropbox/to-do-list-office.html
+  fi
+
+  for arg in $*; do
+    case $arg in
+      -h|--help)
+        help
+        return
+        ;;
+      -a|--all)
+        python3 ${to_do_list_py} ${to_do_list_data} -a
+        return
+        ;;
+      -e|--edit)
+        vi ${to_do_list_data}
+        return
+        ;;
+      -s|--show)
+        google-chrome ${to_do_list_html}
+        return
+        ;;
+      *)
+        python3 ${to_do_list_py} ${to_do_list_data} ${to_do_list_html}
+        return
+        ;;
+    esac
+  done
+
+  python3 ${to_do_list_py} ${to_do_list_data} ${to_do_list_html}
+  return 1;
+}
+% \end{bashcode}
+% ^^A ]]] End of subsection `to-do-list()'.
+%
+% ^^A ]]] End of section `Functions'.
+%
+% \section{etc.}^^A [[[
+%
+% \subsection{ls color}^^A [[[
+% \begin{myitemize}
+% \1 \href{https://unix.stackexchange.com/questions/621720/zsh-how-to-set-ls-color-to-show-any-tar-file-as-different-color-than-white}{zsh: How to set LS_COLOR to show any tar file as different color than white?}
+% \end{myitemize}
+%
+% \begin{bashcode}
+LS_COLORS="${LS_COLORS}*.html=00;36:*.pdf=00;36:*.xlsx=00;36:"
+% \end{bashcode}
+% ^^A ]]] End of subsection `ls color'.
+%
+% \subsection{Anaconda}^^A [[[
+%
+% added by Anaconda3 4.2.0 installer
+%
+% \begin{mywarning}^^A [[[
+% \urlref{https://docs.anaconda.com/anaconda/user-guide/faq/#distribution-faq-linux-path}{ここ}にあるように
+% \verb|PATH="/home/yasutaka/anaconda3/bin:$PATH"|の順だとSpaceVimの補完機能が使えなくなる．
+% \end{mywarning}^^A ]]]
+%
+%
+% 次のcodeだと，\pythoninline{import numpy}できるものの，vimのdeopleteが機能しなくなる：
+% \begin{bashcode}
+# export PATH="/home/yasutaka/anaconda3/bin:$PATH"
+% \end{bashcode}
+%
+% 次のcodeだと，numpyなどが見つからずエラーとなる：
+% \begin{bashcode}
+# export PATH="$PATH:/home/yasutaka/anaconda3/bin"
+% \end{bashcode}
+%
+%
+%
+%
+% \pythoninline{import sys}, \pythoninline{print(sys.path)}
+% \urlref{https://note.nkmk.me/python-import-module-search-path/}
+% {Pythonでimportの対象ディレクトリのパスを確認・追加（sys.pathなど）}
+%
+% \begin{bashcode}
+# export PYTHONPATH="/home/yasutaka/anaconda3/lib/python3.7:/home/yasutaka/anaconda3/lib/python3.7/lib-dynload:/home/yasutaka/anaconda3/lib/python3.7/site-packages"
+# export PYTHONPATH="/home/yasutaka/anaconda3/:/home/yasutaka/anaconda3/bin"
+% \end{bashcode}
+%
+% ^^A ]]] End of subsection `Anaconda'.
+%
+% \subsection{fcitx5}^^A [[[
+% \begin{bashcode}
+fcitx5 &
+% \end{bashcode}
+% ^^A ]]] End of subsection `fcitx5'.
+%
+% ^^A ]]] End of section `etc.'.
+%
+% \begin{bashcode}
+dropbox start
+setxkbmap -option caps:swapescape
+% \end{bashcode}
+%
+% \iffalse
+%</.zshrc>
+% \fi
+%
+% ^^A ]]] End of part `.bashrc , .zshrc'.
+%
+% ^^A End of file `shell.dtx'.
